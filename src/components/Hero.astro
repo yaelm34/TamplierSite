@@ -3,7 +3,7 @@ import { Image } from 'astro:assets';
 import Button from './Button.astro';
 import Marquee from './Marquee.astro';
 import { hero, cta } from '../data/content';
-import porsche from '../assets/images/porsche.png';
+import banner from '../assets/images/banner.png';
 
 const words = (s: string) => s.split(' ');
 ---
@@ -16,13 +16,13 @@ const words = (s: string) => s.split(' ');
   <div class="pointer-events-none absolute inset-y-0 right-0 z-0 hidden w-[58%] lg:block">
     <div data-hero-media class="absolute inset-0 flex items-center">
       <Image
-        src={porsche}
-        alt="Porsche 911 Carrera premium, illustration aquarelle — TAMPLIER Auto Sourcing"
+        src={banner}
+        alt="Véhicule d'exception, illustration aquarelle — TAMPLIER Auto Sourcing"
         widths={[768, 1200, 1600, 2000]}
         sizes="60vw"
         loading="eager"
         fetchpriority="high"
-        class="h-auto w-full object-contain mix-blend-multiply"
+        class="h-auto w-full object-contain"
       />
     </div>
     <!-- soft left fade for the type overlap zone -->
@@ -67,12 +67,12 @@ const words = (s: string) => s.split(' ');
     <!-- Mobile / tablet: car below the text -->
     <div class="relative mb-6 w-full lg:hidden">
       <Image
-        src={porsche}
+        src={banner}
         alt=""
         aria-hidden="true"
         widths={[600, 900, 1200]}
         sizes="100vw"
-        class="h-auto w-full object-contain mix-blend-multiply"
+        class="h-auto w-full object-contain"
       />
     </div>
   </div>

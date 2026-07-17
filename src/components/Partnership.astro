@@ -1,7 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import { partnership } from '../data/content';
-import banner from '../assets/images/banner.jpg';
+import porsche from '../assets/images/porsche.png';
 ---
 
 <section class="on-dark relative overflow-hidden bg-racing-deep py-24 text-ivory sm:py-32 lg:py-40" data-parallax-scope>
@@ -43,13 +43,13 @@ import banner from '../assets/images/banner.jpg';
     <!-- Framed illustration plate -->
     <div class="relative" data-reveal="rise" data-delay="0.15">
       <div data-img-reveal class="relative aspect-[16/10] w-full overflow-hidden border border-gold/25 bg-paper">
-        <div data-parallax="0.08" class="absolute inset-[-6%]">
+        <div data-parallax="0.06" class="absolute inset-[4%]">
           <Image
-            src={banner}
-            alt="Carrosserie automobile protégée par film PPF, illustration aquarelle"
+            src={porsche}
+            alt="Véhicule premium protégé par film PPF, illustration aquarelle"
             widths={[600, 900, 1400]}
             sizes="(max-width: 1024px) 100vw, 50vw"
-            class="h-full w-full object-cover"
+            class="h-full w-full object-contain"
           />
         </div>
       </div>
