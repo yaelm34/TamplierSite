@@ -1,0 +1,12 @@
+---
+// Generic rise+fade reveal wrapper.
+interface Props {
+  as?: string;
+  class?: string;
+  delay?: number;
+}
+const { as: Tag = 'div', class: cls = '', delay } = Astro.props;
+---
+<Tag class={cls} data-reveal="rise" data-delay={delay ?? undefined}>
+  <slot />
+</Tag>

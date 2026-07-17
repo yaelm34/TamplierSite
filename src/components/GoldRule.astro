@@ -1,0 +1,18 @@
+---
+interface Props {
+  class?: string;
+  vertical?: boolean;
+}
+const { class: cls = '', vertical = false } = Astro.props;
+---
+{
+  vertical ? (
+    <span
+      class={`block w-px self-stretch ${cls}`}
+      style="background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--color-gold) 45%, transparent), transparent); opacity:.5"
+      aria-hidden="true"
+    />
+  ) : (
+    <span class={`gold-rule block w-full ${cls}`} aria-hidden="true" />
+  )
+}

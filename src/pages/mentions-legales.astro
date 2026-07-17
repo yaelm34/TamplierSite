@@ -1,0 +1,62 @@
+---
+import LegalLayout from '../components/LegalLayout.astro';
+import { site, legal } from '../data/content';
+---
+<LegalLayout
+  eyebrow="Informations légales"
+  title="Mentions légales"
+  metaTitle={`Mentions légales — ${site.name}`}
+  description="Mentions légales de TAMPLIER AUTO SOURCING SASU — éditeur, hébergement et informations société."
+>
+  <h2>Éditeur du site</h2>
+  <p>
+    Le présent site est édité par <strong>{site.name}</strong>, SASU au capital de {legal.capital}.
+  </p>
+  <ul>
+    <li>Siège social : {site.address.street}, {site.address.postalCode} {site.address.locality}</li>
+    <li>{legal.rcs}</li>
+    <li>SIRET : {legal.siret}</li>
+    <li>N° de TVA intracommunautaire : {legal.tva}</li>
+    <li>Code APE : {legal.ape}</li>
+    <li>Directeur de la publication : {site.founder}, {site.founderRole}</li>
+    <li>Téléphone : <a href={`tel:${site.phoneIntl}`}>{site.phone}</a></li>
+    <li>E-mail : <a href={`mailto:${site.email}`}>{site.email}</a></li>
+  </ul>
+
+  <h2>Hébergement</h2>
+  <p>
+    Ce site est hébergé sur une infrastructure statique haute disponibilité (par ex. Vercel Inc.
+    ou Netlify, Inc.). Les coordonnées complètes de l'hébergeur sont communiquées sur simple
+    demande à l'adresse <a href={`mailto:${site.email}`}>{site.email}</a>.
+  </p>
+
+  <h2>Propriété intellectuelle</h2>
+  <p>
+    L'ensemble des contenus présents sur ce site (textes, illustrations, identité visuelle,
+    logo) est la propriété exclusive de {site.name}, sauf mention contraire. Toute
+    reproduction, représentation, modification ou exploitation, totale ou partielle, sans
+    autorisation écrite préalable est interdite et constituerait une contrefaçon.
+  </p>
+
+  <h2>Activité</h2>
+  <p>
+    {site.name} exerce une activité de mandataire automobile : recherche, audit, négociation et
+    sécurisation d'achat de véhicules premium, sportifs et d'exception, pour le compte de ses
+    clients, en France et en Europe. Les fonds destinés à l'achat du véhicule ne transitent
+    jamais par la société ; ils sont réglés directement au vendeur.
+  </p>
+
+  <h2>Responsabilité</h2>
+  <p>
+    {site.name} s'efforce d'assurer l'exactitude des informations diffusées sur ce site mais ne
+    saurait être tenue responsable des erreurs, omissions ou d'une indisponibilité temporaire du
+    service. Les tarifs indiqués sont susceptibles d'évolution et sont confirmés dans le cadre du
+    mandat de recherche.
+  </p>
+
+  <h2>Droit applicable</h2>
+  <p>
+    Les présentes mentions légales sont régies par le droit français. Tout litige relatif à
+    l'utilisation du site relève de la compétence des tribunaux de Montpellier.
+  </p>
+</LegalLayout>

@@ -1,0 +1,56 @@
+---
+// Hand-drawn fine-line SVG icons (no icon library).
+interface Props {
+  name: 'shield' | 'vault' | 'route' | 'handshake';
+  class?: string;
+}
+const { name, class: cls = '' } = Astro.props;
+const common = {
+  fill: 'none',
+  stroke: 'currentColor',
+  'stroke-width': '1',
+  'stroke-linecap': 'round',
+  'stroke-linejoin': 'round',
+};
+---
+
+<svg viewBox="0 0 40 40" class={cls} aria-hidden="true" {...common}>
+  {
+    name === 'shield' && (
+      <>
+        <path d="M20 4 L33 8.5 V20 C33 28.5 27.4 33.6 20 36 C12.6 33.6 7 28.5 7 20 V8.5 Z" />
+        <path d="M14.5 20.2 L18.4 24 L26 15.5" />
+      </>
+    )
+  }
+  {
+    name === 'vault' && (
+      <>
+        <rect x="6" y="8" width="28" height="24" rx="1.5" />
+        <circle cx="20" cy="20" r="6.5" />
+        <circle cx="20" cy="20" r="1.4" />
+        <path d="M20 13.5 V11 M20 29 v-2.5 M26.5 20 H29 M11 20 H13.5 M24.6 15.4 l1.7-1.7 M13.7 26.3 l1.7-1.7 M24.6 24.6 l1.7 1.7 M13.7 13.7 l1.7 1.7" />
+        <path d="M9 32 v3 M31 32 v3" />
+      </>
+    )
+  }
+  {
+    name === 'route' && (
+      <>
+        <path d="M20 5 c-5 0-9 4-9 9 0 6.5 9 16 9 16 s9-9.5 9-16 c0-5-4-9-9-9 Z" />
+        <circle cx="20" cy="14" r="3.4" />
+        <path d="M9 33 h22" stroke-dasharray="0.5 3.2" />
+      </>
+    )
+  }
+  {
+    name === 'handshake' && (
+      <>
+        <path d="M4 15 L10 12 L20 15 L30 12 L36 15 V26 L30 29 L20 25 L10 29 L4 26 Z" opacity="0.35" />
+        <path d="M20 15 v10" />
+        <path d="M10 12 v17 M30 12 v17" />
+        <path d="M14 19 h4 M22 21 h4" />
+      </>
+    )
+  }
+</svg>

@@ -1,0 +1,70 @@
+---
+import { Image } from 'astro:assets';
+import { site, nav, legal } from '../data/content';
+import wordmark from '../assets/images/logo-wordmark.jpg';
+const year = new Date().getFullYear();
+---
+
+<footer class="on-dark relative overflow-hidden bg-racing-deep text-ivory">
+  <span class="gold-rule absolute inset-x-0 top-0"></span>
+  <div class="mx-auto w-full max-w-[1440px] px-6 py-20 sm:px-10 lg:px-14">
+    <div class="grid gap-14 lg:grid-cols-[1.4fr_1fr_1fr]">
+      <div>
+        <Image
+          src={wordmark}
+          alt={site.name}
+          widths={[200, 320]}
+          sizes="190px"
+          class="h-9 w-auto"
+          style="filter: brightness(0) invert(1); opacity:.92"
+        />
+        <p class="muted mt-6 max-w-[38ch] text-sm">
+          Mandataire automobile spécialisé dans le sourcing de véhicules premium, sportifs
+          et d'exception, en France et en Europe.
+        </p>
+      </div>
+
+      <nav aria-label="Navigation secondaire">
+        <h2 class="eyebrow mb-5">Navigation</h2>
+        <ul class="space-y-3">
+          {nav.map((item) => (
+            <li>
+              <a class="muted text-sm transition-colors hover:text-gold" href={item.href}>{item.label}</a>
+            </li>
+          ))}
+          <li><a class="muted text-sm transition-colors hover:text-gold" href="/mentions-legales">Mentions légales</a></li>
+          <li><a class="muted text-sm transition-colors hover:text-gold" href="/politique-de-confidentialite">Politique de confidentialité</a></li>
+        </ul>
+      </nav>
+
+      <div>
+        <h2 class="eyebrow mb-5">Contact</h2>
+        <ul class="space-y-3 text-sm">
+          <li><a class="muted transition-colors hover:text-gold" href={`tel:${site.phoneIntl}`}>{site.phone}</a></li>
+          <li><a class="muted break-all transition-colors hover:text-gold" href={`mailto:${site.email}`}>{site.email}</a></li>
+          <li class="muted">{site.address.street}<br />{site.address.postalCode} {site.address.locality}</li>
+        </ul>
+        <ul class="mt-6 flex gap-4">
+          {site.socials.map((s) => (
+            <li>
+              <a
+                href={s.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`${s.name} — ${site.name}`}
+                class="flex h-10 w-10 items-center justify-center border border-ivory/20 text-ivory/70 transition-colors hover:border-gold hover:text-gold"
+              >
+                <span class="text-[0.62rem] font-semibold uppercase tracking-wider">{s.name.slice(0, 2)}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+
+    <div class="gold-rule my-12 opacity-40"></div>
+
+    <p class="muted-soft max-w-[95ch] text-[0.6875rem] leading-relaxed">{legal.companyLine}</p>
+    <p class="muted-soft mt-4 text-[0.6875rem]">© {year} {site.name}. Tous droits réservés.</p>
+  </div>
+</footer>

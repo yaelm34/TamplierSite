@@ -1,0 +1,43 @@
+---
+// TAS monogram — templar cross + initials, drawn in fine line.
+interface Props {
+  class?: string;
+  title?: string;
+  variant?: 'mark' | 'lockup';
+}
+const { class: cls = '', title = 'TAMPLIER AUTO SOURCING', variant = 'lockup' } = Astro.props;
+---
+
+<span class={`inline-flex items-center gap-3 ${cls}`} aria-label={title}>
+  <svg
+    viewBox="0 0 48 48"
+    class="h-9 w-9 shrink-0"
+    fill="none"
+    aria-hidden="true"
+    role="img"
+  >
+    <!-- shield outline -->
+    <path
+      d="M24 3 L42 9 V25 C42 35 34 42 24 45 C14 42 6 35 6 25 V9 Z"
+      stroke="currentColor"
+      stroke-width="1"
+      opacity="0.5"
+    />
+    <!-- templar cross pattée -->
+    <path
+      d="M24 13 L27.5 19.5 L34 23 L27.5 26.5 L24 33 L20.5 26.5 L14 23 L20.5 19.5 Z"
+      stroke="currentColor"
+      stroke-width="1"
+      opacity="0.9"
+    />
+    <circle cx="24" cy="23" r="2.1" fill="currentColor" opacity="0.9" />
+  </svg>
+  {
+    variant === 'lockup' && (
+      <span class="flex flex-col leading-none">
+        <span class="font-serif text-[1.35rem] font-light tracking-[0.02em]">TAMPLIER</span>
+        <span class="eyebrow mt-1 text-[0.5rem] tracking-[0.42em] opacity-80">Auto Sourcing</span>
+      </span>
+    )
+  }
+</span>

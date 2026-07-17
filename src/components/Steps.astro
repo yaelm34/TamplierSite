@@ -1,0 +1,67 @@
+---
+import { Image } from 'astro:assets';
+import { steps } from '../data/content';
+
+const imgGlob = import.meta.glob<{ default: ImageMetadata }>(
+  '../assets/images/detail-*.{jpg,png}',
+  { eager: true }
+);
+const images: Record<string, ImageMetadata> = {};
+for (const path in imgGlob) {
+  const key = path.split('/').pop()!.replace(/\.(jpg|png)$/, '');
+  images[key] = imgGlob[path].default;
+}
+---
+
+<section id="methode" data-h-scroll class="on-dark relative overflow-hidden bg-racing-deep text-ivory">
+  <!-- progress bar -->
+  <div class="pointer-events-none absolute inset-x-0 top-0 z-30 hidden h-px bg-ivory/10 lg:block">
+    <span data-h-progress class="block h-full origin-left scale-x-0 bg-gold" style="will-change:transform"></span>
+  </div>
+
+  <div data-h-track class="flex flex-col lg:h-[100svh] lg:flex-row lg:flex-nowrap">
+    <!-- Intro panel -->
+    <div class="flex w-full shrink-0 flex-col justify-center px-6 py-24 sm:px-10 lg:h-full lg:w-[44vw] lg:px-14 lg:py-0">
+      <div class="mb-7 flex items-center gap-4" data-reveal="rise">
+        <span class="index-num text-gold">({steps.index})</span>
+        <span class="h-px w-10 bg-gold/50"></span>
+        <span class="eyebrow">{steps.eyebrow}</span>
+      </div>
+      <h2 class="headline max-w-[12ch]" data-reveal="rise" data-delay="0.05">{steps.title}</h2>
+      <span class="mt-10 hidden items-center gap-3 text-gold/70 lg:flex" data-reveal="rise" data-delay="0.15" aria-hidden="true">
+        <span class="eyebrow text-[0.55rem]">Défiler</span>
+        <span class="h-px w-16 bg-gold/40"></span>
+        <span>→</span>
+      </span>
+    </div>
+
+    <!-- Step panels -->
+    {
+      steps.items.map((step) => (
+        <article class="relative flex w-full shrink-0 flex-col justify-center gap-8 border-t border-ivory/10 px-6 py-20 sm:px-10 lg:h-full lg:w-[40vw] lg:border-l lg:border-t-0 lg:px-14 lg:py-0">
+          <div class="flex items-start justify-between">
+            <span class="numeral-outline text-[6rem] leading-none sm:text-[8rem]">{step.n}</span>
+            <span class="index-num mt-3 text-gold">Étape {step.n}</span>
+          </div>
+
+          <!-- framed illustration plate (white bg pops on dark) -->
+          <div data-img-reveal class="relative aspect-[16/9] w-full overflow-hidden border border-gold/25 bg-paper">
+            <Image
+              src={images[step.image]}
+              alt={step.alt}
+              widths={[500, 800, 1100]}
+              sizes="(max-width: 1024px) 100vw, 40vw"
+              class="h-full w-full object-cover"
+            />
+          </div>
+
+          <div>
+            <h3 class="subhead text-ivory">{step.title}</h3>
+            <span class="my-4 block h-px w-14 bg-gold/50"></span>
+            <p class="prose-lux muted max-w-[42ch] text-[0.95rem]">{step.text}</p>
+          </div>
+        </article>
+      ))
+    }
+  </div>
+</section>

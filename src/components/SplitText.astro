@@ -1,0 +1,18 @@
+---
+// Line-by-line masked reveal. Each entry in `lines` becomes a masked row.
+interface Props {
+  lines: string[];
+  class?: string;
+  as?: string;
+}
+const { lines, class: cls = '', as: Tag = 'h2' } = Astro.props;
+---
+<Tag class={cls} data-split>
+  {
+    lines.map((line) => (
+      <span class="line-mask">
+        <span class="line-inner">{line}</span>
+      </span>
+    ))
+  }
+</Tag>

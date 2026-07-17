@@ -1,0 +1,62 @@
+---
+import SplitText from './SplitText.astro';
+
+interface Props {
+  id?: string;
+  tone?: 'paper' | 'paper-warm' | 'ink';
+  eyebrow?: string;
+  index?: string;
+  title?: string | string[];
+  class?: string;
+  container?: boolean;
+  glow?: boolean;
+}
+const {
+  id,
+  tone = 'paper',
+  eyebrow,
+  index,
+  title,
+  class: cls = '',
+  container = true,
+  glow = false,
+} = Astro.props;
+
+const toneClass: Record<string, string> = {
+  paper: 'bg-paper text-racing',
+  'paper-warm': 'bg-paper-2 text-racing',
+  ink: 'on-dark bg-racing-deep text-ivory',
+};
+const titleLines = Array.isArray(title) ? title : title ? [title] : [];
+const dark = tone === 'ink';
+---
+
+<section
+  id={id}
+  class={`relative overflow-hidden py-24 sm:py-32 lg:py-40 ${toneClass[tone]} ${cls}`}
+  data-parallax-scope
+>
+  {glow && dark && <span class="glow-follow" aria-hidden="true"></span>}
+
+  <div class={container ? 'relative mx-auto w-full max-w-[1440px] px-6 sm:px-10 lg:px-14' : 'relative'}>
+    {
+      (eyebrow || titleLines.length > 0) && (
+        <header class="mb-16 sm:mb-20">
+          {(eyebrow || index) && (
+            <div class="mb-7 flex items-center gap-4" data-reveal="rise">
+              {index && (
+                <span class={`index-num ${dark ? 'text-gold' : 'text-gold-dark'}`}>({index})</span>
+              )}
+              <span class={`h-px w-10 ${dark ? 'bg-gold/50' : 'bg-gold-dark/50'}`} />
+              {eyebrow && <span class="eyebrow">{eyebrow}</span>}
+            </div>
+          )}
+          {titleLines.length > 0 && (
+            <SplitText lines={titleLines} class="headline max-w-[20ch]" />
+          )}
+        </header>
+      )
+    }
+    <slot />
+  </div>
+</section>

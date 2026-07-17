@@ -1,0 +1,190 @@
+---
+import SplitText from './SplitText.astro';
+import Button from './Button.astro';
+import { contact, site } from '../data/content';
+const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT ?? '';
+---
+
+<section id="contact" class="relative overflow-hidden bg-paper-2 py-24 text-racing sm:py-32 lg:py-40" data-parallax-scope>
+  <div class="relative mx-auto grid w-full max-w-[1440px] gap-16 px-6 sm:px-10 lg:grid-cols-[0.85fr_1.15fr] lg:gap-24 lg:px-14">
+    <!-- Coordinates -->
+    <div>
+      <div class="mb-6 flex items-center gap-4" data-reveal="rise">
+        <span class="index-num text-gold-dark">({contact.index})</span>
+        <span class="h-px w-10 bg-gold-dark/50"></span>
+        <span class="eyebrow">{contact.eyebrow}</span>
+      </div>
+      <SplitText lines={[contact.title]} class="headline max-w-[12ch]" />
+      <p class="body-lg muted mt-8 max-w-[38ch]" data-reveal="rise" data-delay="0.1">
+        {contact.intro}
+      </p>
+
+      <div class="hair-rule my-10"></div>
+
+      <dl class="space-y-7" data-stagger>
+        <div data-stagger-item>
+          <dt class="eyebrow mb-1">Interlocuteur</dt>
+          <dd class="font-serif text-2xl font-light text-racing">{site.founder}</dd>
+          <dd class="muted text-sm">{site.founderRole}</dd>
+        </div>
+        <div data-stagger-item>
+          <dt class="eyebrow mb-1">Siège social</dt>
+          <dd class="muted text-sm">
+            {site.address.street}<br />
+            {site.address.postalCode} {site.address.locality} / {site.address.region}
+          </dd>
+        </div>
+        <div data-stagger-item>
+          <dt class="eyebrow mb-1">Téléphone</dt>
+          <dd>
+            <a class="text-lg text-racing transition-colors hover:text-gold-dark" href={`tel:${site.phoneIntl}`}>
+              {site.phone}
+            </a>
+          </dd>
+        </div>
+        <div data-stagger-item>
+          <dt class="eyebrow mb-1">E-mail</dt>
+          <dd>
+            <a class="break-all text-lg text-racing transition-colors hover:text-gold-dark" href={`mailto:${site.email}`}>
+              {site.email}
+            </a>
+          </dd>
+        </div>
+        <div data-stagger-item>
+          <dt class="eyebrow mb-2">Réseaux</dt>
+          <dd class="flex flex-wrap gap-3">
+            {
+              site.socials.map((s) => (
+                <a
+                  href={s.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="border border-racing/20 px-3 py-1.5 text-[0.7rem] uppercase tracking-wider text-racing/70 transition-colors hover:border-gold-dark hover:text-gold-dark"
+                >
+                  {s.name}
+                </a>
+              ))
+            }
+          </dd>
+        </div>
+      </dl>
+    </div>
+
+    <!-- Form -->
+    <div data-reveal="rise" data-delay="0.15">
+      <form
+        data-contact-form
+        data-endpoint={endpoint}
+        data-mailto={site.email}
+        class="grid gap-x-8 gap-y-2 sm:grid-cols-2"
+        novalidate
+      >
+        <div class="field">
+          <input id="name" name="name" type="text" placeholder=" " required autocomplete="name" />
+          <label for="name">Nom</label>
+        </div>
+        <div class="field">
+          <input id="email" name="email" type="email" placeholder=" " required autocomplete="email" />
+          <label for="email">E-mail</label>
+        </div>
+        <div class="field">
+          <input id="phone" name="phone" type="tel" placeholder=" " autocomplete="tel" />
+          <label for="phone">Téléphone</label>
+        </div>
+        <div class="field">
+          <select id="pack" name="pack" required>
+            <option value="" selected hidden></option>
+            {contact.packOptions.map((o) => <option value={o}>{o}</option>)}
+          </select>
+          <label for="pack">Pack souhaité</label>
+        </div>
+        <div class="field">
+          <input id="budget" name="budget" type="text" placeholder=" " inputmode="numeric" />
+          <label for="budget">Budget</label>
+        </div>
+        <div class="field">
+          <input id="vehicle" name="vehicle" type="text" placeholder=" " />
+          <label for="vehicle">Véhicule recherché</label>
+        </div>
+        <div class="field sm:col-span-2">
+          <textarea id="message" name="message" placeholder=" " rows="4"></textarea>
+          <label for="message">Message</label>
+        </div>
+
+        <!-- honeypot -->
+        <input type="text" name="company" tabindex="-1" autocomplete="off" class="hidden" aria-hidden="true" />
+
+        <div class="mt-6 flex flex-col gap-4 sm:col-span-2 sm:flex-row sm:items-center sm:justify-between">
+          <p class="muted-soft max-w-[34ch] text-xs" data-form-status role="status" aria-live="polite">
+            Réponse personnelle sous 24 h.
+          </p>
+          <Button type="submit" variant="solid" magnetic={false}>Envoyer ma demande</Button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<script
+  is:inline
+  define:vars={{
+    successText: contact.fields.successText,
+    errorText: contact.fields.errorText,
+  }}
+>
+  const form = document.querySelector('[data-contact-form]');
+  if (form) {
+    const status = form.querySelector('[data-form-status]');
+    // float labels for selects
+    form.querySelectorAll('select').forEach((sel) => {
+      const sync = () => sel.setAttribute('data-filled', sel.value ? 'true' : 'false');
+      sel.addEventListener('change', sync);
+      sync();
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (form.company && form.company.value) return; // honeypot
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+      const data = Object.fromEntries(new FormData(form).entries());
+      delete data.company;
+      const endpoint = form.dataset.endpoint;
+      const mailto = form.dataset.mailto;
+
+      const setStatus = (msg, ok) => {
+        if (!status) return;
+        status.textContent = msg;
+        status.style.color = ok ? 'var(--color-gold-dark)' : '#b02a2a';
+      };
+
+      if (endpoint) {
+        try {
+          setStatus('Envoi en cours…', true);
+          const res = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify(data),
+          });
+          if (!res.ok) throw new Error('bad status');
+          form.reset();
+          form.querySelectorAll('select').forEach((s) => s.setAttribute('data-filled', 'false'));
+          setStatus(successText, true);
+        } catch {
+          setStatus(errorText, false);
+        }
+      } else {
+        // mailto fallback
+        const subject = encodeURIComponent(`Demande de projet — ${data.pack || 'à définir'}`);
+        const body = encodeURIComponent(
+          `Nom : ${data.name}\nE-mail : ${data.email}\nTéléphone : ${data.phone || '—'}\n` +
+            `Pack : ${data.pack || '—'}\nBudget : ${data.budget || '—'}\nVéhicule : ${data.vehicle || '—'}\n\n${data.message || ''}`
+        );
+        window.location.href = `mailto:${mailto}?subject=${subject}&body=${body}`;
+        setStatus('Votre logiciel de messagerie va s’ouvrir…', true);
+      }
+    });
+  }
+</script>

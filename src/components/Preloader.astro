@@ -1,0 +1,51 @@
+---
+// Green curtain with TAS monogram, lifted once assets are ready.
+---
+<div
+  data-preloader
+  class="fixed inset-0 z-[100] flex items-center justify-center bg-racing-deep"
+  aria-hidden="true"
+>
+  <div data-preloader-mark class="flex flex-col items-center gap-6">
+    <svg viewBox="0 0 48 48" class="h-16 w-16 text-gold" fill="none" aria-hidden="true">
+      <path
+        d="M24 3 L42 9 V25 C42 35 34 42 24 45 C14 42 6 35 6 25 V9 Z"
+        stroke="currentColor"
+        stroke-width="0.8"
+        opacity="0.5"
+      />
+      <path
+        class="loader-cross"
+        d="M24 13 L27.5 19.5 L34 23 L27.5 26.5 L24 33 L20.5 26.5 L14 23 L20.5 19.5 Z"
+        stroke="currentColor"
+        stroke-width="0.8"
+      />
+      <circle cx="24" cy="23" r="2" fill="currentColor" />
+    </svg>
+    <span class="eyebrow tracking-[0.5em]">TAS</span>
+  </div>
+</div>
+
+<style>
+  .loader-cross {
+    stroke-dasharray: 60;
+    stroke-dashoffset: 60;
+    animation: draw 1.4s var(--ease-lux) forwards, pulse 2s ease-in-out 1.4s infinite;
+  }
+  @keyframes draw {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+  @keyframes pulse {
+    50% {
+      opacity: 0.4;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .loader-cross {
+      animation: none;
+      stroke-dashoffset: 0;
+    }
+  }
+</style>

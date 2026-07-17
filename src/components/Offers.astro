@@ -1,0 +1,68 @@
+---
+import Section from './Section.astro';
+import Button from './Button.astro';
+import { offers, cta } from '../data/content';
+---
+
+<Section id="offres" tone="paper-warm" eyebrow={offers.eyebrow} index={offers.index} title={offers.title}>
+  <p class="body-lg muted -mt-8 mb-16 max-w-[46ch]" data-reveal="rise">{offers.intro}</p>
+
+  <div class="grid items-stretch gap-5 lg:grid-cols-3 lg:gap-6" data-stagger>
+    {
+      offers.packs.map((pack) => {
+        const dark = pack.featured;
+        return (
+          <article
+            data-stagger-item
+            class={`sweep group relative flex flex-col p-8 transition-transform duration-700 ease-[var(--ease-lux)] sm:p-9
+              ${
+                dark
+                  ? 'on-dark bg-racing text-ivory lg:-mt-6 lg:mb-6'
+                  : 'border border-racing/12 bg-paper text-racing hover:border-racing/30'
+              }`}
+          >
+            {dark && pack.badge && (
+              <span class="absolute -top-3 left-8 bg-gold px-4 py-1 text-[0.6rem] font-semibold uppercase tracking-[0.2em] text-racing-deep">
+                {pack.badge}
+              </span>
+            )}
+
+            <header class="relative z-10">
+              <h3 class="subhead">{pack.name}</h3>
+              <p class={`mt-2 min-h-[2.6em] text-sm italic ${dark ? 'text-gold-light/90' : 'text-gold-dark'}`}>{pack.tag}</p>
+              <div class="mt-6 font-serif text-4xl font-light">{pack.price}</div>
+              {pack.priceNote && <p class="muted-soft mt-1 text-xs">({pack.priceNote})</p>}
+            </header>
+
+            <span class={`my-7 block h-px w-full ${dark ? 'bg-ivory/15' : 'bg-racing/12'}`}></span>
+
+            <div class="relative z-10 flex-1">
+              {pack.intro && <p class="muted mb-4 text-sm">{pack.intro}</p>}
+              {pack.inherit && <p class={`mb-4 text-sm font-medium ${dark ? 'text-gold-light/90' : 'text-gold-dark'}`}>{pack.inherit}</p>}
+              <ul class="space-y-3.5">
+                {pack.features.map((f) => (
+                  <li class="flex gap-3 text-sm leading-relaxed">
+                    <span class={`mt-2 h-1 w-1 shrink-0 rotate-45 ${dark ? 'bg-gold' : 'bg-gold-dark'}`} aria-hidden="true" />
+                    <span class="muted">{f}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div class="relative z-10 mt-9">
+              <Button href={cta.primary.href} variant={dark ? 'gold' : 'outline'} class="w-full" magnetic={false}>
+                {dark ? 'Choisir Premium' : 'Demander un devis'}
+              </Button>
+            </div>
+          </article>
+        );
+      })
+    }
+  </div>
+
+  <!-- Delivery note -->
+  <aside class="mt-14 flex flex-col gap-4 border-l-2 border-gold-dark/50 bg-paper p-7 sm:flex-row sm:items-start sm:gap-8" data-reveal="rise">
+    <h3 class="eyebrow shrink-0 sm:w-48">{offers.deliveryNote.title}</h3>
+    <p class="muted text-sm">{offers.deliveryNote.text}</p>
+  </aside>
+</Section>

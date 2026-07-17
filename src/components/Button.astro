@@ -1,0 +1,49 @@
+---
+interface Props {
+  href?: string;
+  variant?: 'solid' | 'outline' | 'outline-ivory';
+  class?: string;
+  type?: 'button' | 'submit';
+  magnetic?: boolean;
+  [key: string]: any;
+}
+const {
+  href,
+  variant = 'solid',
+  class: cls = '',
+  type = 'button',
+  magnetic = true,
+  ...rest
+} = Astro.props;
+
+const base =
+  'group relative inline-flex items-center justify-center gap-3 px-8 py-4 text-[0.72rem] font-medium uppercase tracking-[0.22em] transition-colors duration-500 ease-[var(--ease-lux)] overflow-hidden';
+
+const variants: Record<string, string> = {
+  // green pill — reads on both light and dark backgrounds
+  solid: 'bg-racing text-ivory hover:bg-racing-deep',
+  // gold pill — for the dark, dramatic surfaces
+  gold: 'bg-gold text-racing-deep hover:bg-gold-light',
+  // light-bg outline
+  outline: 'border border-racing/35 text-racing hover:border-racing hover:bg-racing/5',
+  // dark-bg outline
+  'outline-ivory': 'border border-ivory/40 text-ivory hover:border-ivory hover:bg-ivory/5',
+};
+
+const Tag = href ? 'a' : 'button';
+---
+
+<Tag
+  href={href}
+  type={href ? undefined : type}
+  class={`${base} ${variants[variant]} sweep ${cls}`}
+  data-magnetic={magnetic ? '' : undefined}
+  {...rest}
+>
+  <span class="relative z-10 flex items-center gap-3">
+    <slot />
+    <span
+      class="inline-block h-px w-6 bg-current opacity-60 transition-all duration-500 ease-[var(--ease-lux)] group-hover:w-9"
+    ></span>
+  </span>
+</Tag>

@@ -1,0 +1,114 @@
+---
+import { Image } from 'astro:assets';
+import Button from './Button.astro';
+import { nav, cta, site } from '../data/content';
+import wordmark from '../assets/images/logo-wordmark.jpg';
+---
+
+<header
+  data-header
+  data-scrolled="false"
+  class="fixed inset-x-0 top-0 z-50 transition-[background-color,backdrop-filter,border-color] duration-500 ease-[var(--ease-lux)]
+         data-[scrolled=true]:bg-paper/85 data-[scrolled=true]:backdrop-blur-xl
+         border-b border-transparent data-[scrolled=true]:border-racing/10"
+>
+  <div class="mx-auto flex h-[var(--header-h)] w-full max-w-[1440px] items-center justify-between px-6 sm:px-10 lg:px-14">
+    <a href="#top" class="block shrink-0 transition-opacity hover:opacity-70" aria-label={`${site.name} — accueil`}>
+      <Image
+        src={wordmark}
+        alt={site.name}
+        widths={[160, 260, 360]}
+        sizes="150px"
+        loading="eager"
+        class="h-8 w-auto sm:h-9"
+      />
+    </a>
+
+    <nav class="hidden items-center gap-9 lg:flex" aria-label="Navigation principale">
+      {
+        nav.map((item, i) => (
+          <a
+            href={item.href}
+            class="group relative flex items-center gap-2 text-[0.72rem] font-medium uppercase tracking-[0.18em] text-racing/70 transition-colors duration-300 hover:text-racing"
+          >
+            <span class="text-[0.6rem] text-gold-dark/70 tabular-nums">{String(i + 1).padStart(2, '0')}</span>
+            {item.label}
+            <span class="absolute -bottom-1.5 left-0 h-px w-0 bg-gold-dark transition-all duration-500 ease-[var(--ease-lux)] group-hover:w-full" />
+          </a>
+        ))
+      }
+    </nav>
+
+    <div class="hidden lg:block">
+      <Button href={cta.primary.href} variant="solid" class="!px-6 !py-3">{cta.primary.label}</Button>
+    </div>
+
+    <!-- Mobile toggle -->
+    <button
+      type="button"
+      class="relative z-50 flex h-11 w-11 items-center justify-center lg:hidden"
+      aria-label="Ouvrir le menu"
+      data-menu-toggle
+    >
+      <span class="menu-bars relative block h-3 w-6">
+        <span class="menu-bar absolute left-0 top-0 h-px w-full bg-racing transition-all duration-400 ease-[var(--ease-lux)]"></span>
+        <span class="menu-bar absolute bottom-0 left-0 h-px w-full bg-racing transition-all duration-400 ease-[var(--ease-lux)]"></span>
+      </span>
+    </button>
+  </div>
+</header>
+
+<!-- Full-screen mobile overlay (dark, dramatic) -->
+<div
+  data-menu-panel
+  class="on-dark fixed inset-0 z-40 flex translate-y-[-100%] flex-col justify-center bg-racing-deep px-8 opacity-0 transition-[transform,opacity] duration-700 ease-[var(--ease-lux)] lg:hidden"
+  aria-hidden="true"
+>
+  <span class="glow-follow" aria-hidden="true"></span>
+  <nav class="relative flex flex-col gap-2" aria-label="Navigation mobile">
+    {
+      nav.map((item, i) => (
+        <a
+          href={item.href}
+          class="flex items-baseline gap-4 border-b border-ivory/10 py-5 font-serif text-4xl font-light text-ivory"
+        >
+          <span class="text-[0.7rem] font-sans font-medium tracking-widest text-gold">{String(i + 1).padStart(2, '0')}</span>
+          {item.label}
+        </a>
+      ))
+    }
+  </nav>
+  <div class="relative mt-12">
+    <Button href={cta.primary.href} variant="solid" magnetic={false}>{cta.primary.label}</Button>
+  </div>
+</div>
+
+<style is:global>
+  [data-menu-open] [data-menu-panel] {
+    transform: translateY(0) !important;
+    opacity: 1 !important;
+  }
+  [data-menu-open] .menu-bar {
+    background: var(--color-ivory);
+  }
+  [data-menu-open] .menu-bars .menu-bar:first-child {
+    transform: translateY(6px) rotate(45deg);
+  }
+  [data-menu-open] .menu-bars .menu-bar:last-child {
+    transform: translateY(-5px) rotate(-45deg);
+  }
+  [data-menu-open] {
+    overflow: hidden;
+  }
+</style>
+
+<script>
+  const toggle = document.querySelector('[data-menu-toggle]');
+  const root = document.documentElement;
+  toggle?.addEventListener('click', () => {
+    const open = root.hasAttribute('data-menu-open');
+    if (open) root.removeAttribute('data-menu-open');
+    else root.setAttribute('data-menu-open', '');
+    toggle.setAttribute('aria-label', open ? 'Ouvrir le menu' : 'Fermer le menu');
+  });
+</script>

@@ -1,0 +1,36 @@
+---
+// Kinetic infinite marquee. Duplicates the item set for a seamless loop.
+interface Props {
+  items: string[];
+  duration?: number; // seconds
+  reverse?: boolean;
+  class?: string;
+  separator?: string;
+}
+const {
+  items,
+  duration = 42,
+  reverse = false,
+  class: cls = '',
+  separator = '·',
+} = Astro.props;
+const groups = [0, 1]; // two copies for seamless -100% loop
+---
+<div
+  class={`marquee ${reverse ? 'marquee--reverse' : ''} ${cls}`}
+  style={`--marq-dur:${duration}s`}
+  aria-hidden="true"
+>
+  {
+    groups.map(() => (
+      <div class="marquee__track">
+        {items.map((item) => (
+          <span class="inline-flex items-center whitespace-nowrap">
+            <span class="px-6">{item}</span>
+            <span class="text-gold opacity-70">{separator}</span>
+          </span>
+        ))}
+      </div>
+    ))
+  }
+</div>
