@@ -23,7 +23,6 @@ for (const path in imgGlob) {
     <!-- Intro panel -->
     <div class="flex w-full shrink-0 flex-col justify-center px-6 py-24 sm:px-10 lg:h-full lg:w-[44vw] lg:px-14 lg:py-0">
       <div class="mb-7 flex items-center gap-4" data-reveal="rise">
-        <span class="index-num text-gold">({steps.index})</span>
         <span class="h-px w-10 bg-gold/50"></span>
         <span class="eyebrow">{steps.eyebrow}</span>
       </div>
@@ -38,21 +37,20 @@ for (const path in imgGlob) {
     <!-- Step panels -->
     {
       steps.items.map((step) => (
-        <article class="relative flex w-full shrink-0 flex-col justify-center gap-8 border-t border-ivory/10 px-6 py-20 sm:px-10 lg:h-full lg:w-[40vw] lg:border-l lg:border-t-0 lg:px-14 lg:py-0">
-          <div class="flex items-start justify-between">
-            <span class="numeral-outline text-[6rem] leading-none sm:text-[8rem]">{step.n}</span>
-            <span class="index-num mt-3 text-gold">Étape {step.n}</span>
-          </div>
+        <article class="relative flex w-full shrink-0 flex-col justify-center gap-7 border-t border-ivory/10 px-6 py-20 sm:px-10 lg:h-full lg:w-[40vw] lg:border-l lg:border-t-0 lg:px-14 lg:py-0">
+          <span class="numeral-outline block text-[5rem] leading-none sm:text-[7rem]">{step.n}</span>
 
-          <!-- framed illustration plate (white bg pops on dark) -->
-          <div data-img-reveal class="relative aspect-[16/9] w-full overflow-hidden border border-gold/25 bg-paper">
-            <Image
-              src={images[step.image]}
-              alt={step.alt}
-              widths={[500, 800, 1100]}
-              sizes="(max-width: 1024px) 100vw, 40vw"
-              class="h-full w-full object-cover"
-            />
+          <!-- plate — image breathes inside its frame -->
+          <div data-img-reveal class="relative aspect-[16/9] w-full overflow-hidden border border-gold/20 bg-paper" data-parallax-scope>
+            <div data-parallax="0.05" class="absolute inset-[-7%]">
+              <Image
+                src={images[step.image]}
+                alt={step.alt}
+                widths={[500, 800, 1100]}
+                sizes="(max-width: 1024px) 100vw, 40vw"
+                class="h-full w-full object-cover"
+              />
+            </div>
           </div>
 
           <div>

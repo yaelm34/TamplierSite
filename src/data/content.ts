@@ -52,13 +52,13 @@ export const cta = {
 
 export const hero = {
   eyebrow: 'Mandataire automobile · Montpellier',
-  // display words — set in italic/roman for editorial rhythm
-  titleTop: 'Le mandataire',
-  titleAccent: 'de confiance',
-  titleBottom: 'pour votre auto',
-  subtitle: 'Premium · Sportive · Exception',
+  // museum-piece composition — roman line + italic accent
+  titleTop: "L'art du sourcing",
+  titleAccent: 'automobile.',
   lead:
-    "Confiez vos critères. J'active mon réseau en France et en Europe — je déniche, audite, négocie et sécurise.",
+    "Recherche, audit, négociation et livraison de véhicules premium, sportifs et d'exception — en France et en Europe.",
+  caption: 'Porsche 911 Carrera · Réseau officiel',
+  captionRight: 'Sourcing TAS',
   scrollHint: 'Défiler',
   marquee: [
     'Sourcing',
@@ -69,6 +69,12 @@ export const hero = {
     'Garantie',
     'Sur mesure',
   ],
+};
+
+// Manifesto — revealed word by word on scroll
+export const manifesto = {
+  text: "Dénicher la perle rare n'est pas une question de chance. C'est une méthode, un réseau, une exigence.",
+  goldWords: ['méthode', 'réseau', 'exigence'],
 };
 
 // Kinetic brand band — the network Anthony activates
@@ -233,8 +239,8 @@ export const trust = {
 
 export const contact = {
   eyebrow: 'Prenons contact',
-  index: '06',
-  title: 'Parlons de votre projet',
+  title: 'Un projet ?',
+  titleAccent: 'Parlons-en.',
   intro:
     'Décrivez votre projet en quelques mots. Réponse personnelle sous 24 heures.',
   packOptions: ['Executive', 'Premium', 'Prestige', 'Je ne sais pas encore'],

@@ -138,35 +138,66 @@ function parallax() {
 function hero() {
   const heroEl = document.querySelector<HTMLElement>('[data-hero]');
   if (!heroEl || reduced) return;
+
+  // slow perpetual breath on the car
+  const img = heroEl.querySelector<HTMLElement>('[data-hero-media] img');
+  if (img) {
+    gsap.fromTo(
+      img,
+      { scale: 1.03 },
+      { scale: 1.1, duration: 18, ease: 'sine.inOut', repeat: -1, yoyo: true }
+    );
+  }
+  // car drifts up slightly as you leave the hero
   const media = heroEl.querySelector<HTMLElement>('[data-hero-media]');
-  const overlay = heroEl.querySelector<HTMLElement>('[data-hero-overlay]');
   if (media) {
     gsap.to(media, {
-      scale: 1.14,
-      duration: 20,
-      ease: 'none',
-      repeat: -1,
-      yoyo: true,
-    });
-  }
-  gsap.to(heroEl, {
-    scale: 0.94,
-    yPercent: 6,
-    ease: 'none',
-    scrollTrigger: {
-      trigger: heroEl,
-      start: 'top top',
-      end: 'bottom top',
-      scrub: true,
-    },
-  });
-  if (overlay) {
-    gsap.to(overlay, {
-      opacity: 1,
+      yPercent: -7,
       ease: 'none',
       scrollTrigger: { trigger: heroEl, start: 'top top', end: 'bottom top', scrub: true },
     });
   }
+}
+
+/* ---------- 6b. Hero title — word-by-word masked rise ---------- */
+function heroWords() {
+  const el = document.querySelector<HTMLElement>('[data-word-reveal]');
+  if (!el) return;
+  const inners = el.querySelectorAll<HTMLElement>('.w-inner');
+  if (reduced) {
+    gsap.set(inners, { yPercent: 0, rotate: 0 });
+    return;
+  }
+  gsap.set(inners, { yPercent: 120, rotate: 5 });
+  gsap.to(inners, {
+    yPercent: 0,
+    rotate: 0,
+    duration: 1.5,
+    ease: 'expo.out',
+    stagger: 0.07,
+    delay: 0.55,
+  });
+}
+
+/* ---------- 6c. Manifesto — words fill on scroll scrub ---------- */
+function wordScrub() {
+  document.querySelectorAll<HTMLElement>('[data-word-scrub]').forEach((el) => {
+    const words = el.querySelectorAll<HTMLElement>('.scrub-word');
+    if (reduced || words.length === 0) {
+      gsap.set(words, { opacity: 1 });
+      return;
+    }
+    gsap.fromTo(
+      words,
+      { opacity: 0.13 },
+      {
+        opacity: 1,
+        ease: 'none',
+        stagger: 0.06,
+        scrollTrigger: { trigger: el, start: 'top 78%', end: 'bottom 42%', scrub: 0.4 },
+      }
+    );
+  });
 }
 
 /* ---------- 7. Horizontal pinned steps ---------- */
@@ -229,17 +260,22 @@ function counters() {
   });
 }
 
-/* ---------- 9. Header scroll state ---------- */
+/* ---------- 9. Header scroll state (+ hide on scroll down) ---------- */
 function header() {
   const header = document.querySelector<HTMLElement>('[data-header]');
   if (!header) return;
   ScrollTrigger.create({
-    start: 'top -60',
-    end: 99999,
+    start: 0,
+    end: 'max',
     onUpdate: (self) => {
-      header.setAttribute('data-scrolled', self.direction === 1 || window.scrollY > 60 ? 'true' : 'false');
-      if (window.scrollY > 60) header.setAttribute('data-scrolled', 'true');
-      else header.setAttribute('data-scrolled', 'false');
+      const y = window.scrollY;
+      header.setAttribute('data-scrolled', y > 60 ? 'true' : 'false');
+      // reading mode: header retires going down, returns going up
+      if (!reduced && y > 320 && self.direction === 1) {
+        header.setAttribute('data-hidden', 'true');
+      } else {
+        header.setAttribute('data-hidden', 'false');
+      }
     },
   });
 }
@@ -350,6 +386,8 @@ export function boot() {
   header();
   cursor();
   hero();
+  heroWords();
+  wordScrub();
   splitReveal();
   imageReveals();
   fadeReveals();

@@ -8,8 +8,10 @@ import wordmark from '../assets/images/logo-wordmark.jpg';
 <header
   data-header
   data-scrolled="false"
-  class="fixed inset-x-0 top-0 z-50 transition-[background-color,backdrop-filter,border-color] duration-500 ease-[var(--ease-lux)]
+  data-hidden="false"
+  class="fixed inset-x-0 top-0 z-50 transition-[background-color,backdrop-filter,border-color,transform] duration-500 ease-[var(--ease-lux)]
          data-[scrolled=true]:bg-paper/85 data-[scrolled=true]:backdrop-blur-xl
+         data-[hidden=true]:-translate-y-full
          border-b border-transparent data-[scrolled=true]:border-racing/10"
 >
   <div class="mx-auto flex h-[var(--header-h)] w-full max-w-[1440px] items-center justify-between px-6 sm:px-10 lg:px-14">
@@ -26,12 +28,11 @@ import wordmark from '../assets/images/logo-wordmark.jpg';
 
     <nav class="hidden items-center gap-9 lg:flex" aria-label="Navigation principale">
       {
-        nav.map((item, i) => (
+        nav.map((item) => (
           <a
             href={item.href}
             class="group relative flex items-center gap-2 text-[0.72rem] font-medium uppercase tracking-[0.18em] text-racing/70 transition-colors duration-300 hover:text-racing"
           >
-            <span class="text-[0.6rem] text-gold-dark/70 tabular-nums">{String(i + 1).padStart(2, '0')}</span>
             {item.label}
             <span class="absolute -bottom-1.5 left-0 h-px w-0 bg-gold-dark transition-all duration-500 ease-[var(--ease-lux)] group-hover:w-full" />
           </a>
@@ -67,12 +68,11 @@ import wordmark from '../assets/images/logo-wordmark.jpg';
   <span class="glow-follow" aria-hidden="true"></span>
   <nav class="relative flex flex-col gap-2" aria-label="Navigation mobile">
     {
-      nav.map((item, i) => (
+      nav.map((item) => (
         <a
           href={item.href}
           class="flex items-baseline gap-4 border-b border-ivory/10 py-5 font-serif text-4xl font-light text-ivory"
         >
-          <span class="text-[0.7rem] font-sans font-medium tracking-widest text-gold">{String(i + 1).padStart(2, '0')}</span>
           {item.label}
         </a>
       ))
@@ -99,6 +99,10 @@ import wordmark from '../assets/images/logo-wordmark.jpg';
   }
   [data-menu-open] {
     overflow: hidden;
+  }
+  /* header never retires while the menu is open */
+  [data-menu-open] [data-header] {
+    transform: none !important;
   }
 </style>
 

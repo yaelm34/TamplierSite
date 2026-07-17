@@ -6,61 +6,56 @@ import aston from '../assets/images/aston.png';
 ---
 
 <section id="concept" class="relative overflow-hidden bg-paper py-24 text-racing sm:py-32 lg:py-40" data-parallax-scope>
-  <!-- ghost numeral -->
-  <span class="numeral-ghost pointer-events-none absolute -top-6 right-4 select-none text-[26vw] leading-none lg:text-[18rem]" aria-hidden="true">01</span>
-
   <div class="relative mx-auto w-full max-w-[1440px] px-6 sm:px-10 lg:px-14">
     <div class="mb-7 flex items-center gap-4" data-reveal="rise">
-      <span class="index-num text-gold-dark">({concept.index})</span>
       <span class="h-px w-10 bg-gold-dark/50"></span>
       <span class="eyebrow">{concept.eyebrow}</span>
     </div>
 
-    <div class="grid items-end gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
+    <div class="grid items-end gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
       <SplitText lines={[concept.title]} class="headline max-w-[10ch]" />
-      <p class="font-serif text-[clamp(1.5rem,2.4vw,2.1rem)] font-light italic leading-tight text-gold-dark" data-reveal="rise" data-delay="0.1">
+      <p class="font-serif text-[clamp(1.4rem,2.2vw,2rem)] font-light italic leading-snug text-gold-dark lg:pb-2" data-reveal="rise" data-delay="0.1">
         {concept.lead}
       </p>
     </div>
 
-    <div class="mt-16 grid items-center gap-14 lg:mt-20 lg:grid-cols-[0.85fr_1.15fr] lg:gap-20">
-      <!-- text + stats -->
-      <div>
-        <div class="prose-lux space-y-5">
-          {concept.paragraphs.map((p, i) => (
-            <p class="body-lg muted" data-reveal="rise" data-delay={0.1 + i * 0.1}>{p}</p>
-          ))}
+    <!-- The artwork — full width, breathing inside its own space -->
+    <div class="mt-16 lg:mt-20">
+      <div data-img-reveal class="relative aspect-[16/8] w-full overflow-hidden sm:aspect-[21/9]">
+        <div data-parallax="0.07" class="absolute inset-[-8%]">
+          <Image
+            src={aston}
+            alt="Aston Martin DB de profil, illustration aquarelle premium"
+            widths={[700, 1000, 1400, 1408]}
+            sizes="(max-width: 1440px) 100vw, 1360px"
+            class="h-full w-full object-contain mix-blend-multiply"
+          />
         </div>
+      </div>
+      <div class="mt-1 flex items-center justify-between border-t border-racing/10 pt-4">
+        <span class="caption muted-soft">Aston Martin DB — profil</span>
+        <span class="caption text-gold-dark">France &amp; Europe</span>
+      </div>
+    </div>
 
-        <div class="hair-rule my-10"></div>
-
-        <dl class="grid grid-cols-3 gap-6" data-stagger>
-          {concept.stats.map((s) => (
-            <div data-stagger-item>
-              <dd class="font-serif text-4xl font-light text-racing sm:text-5xl">
-                <span data-count={s.value} data-suffix={s.suffix}>0{s.suffix}</span>
-              </dd>
-              <dt class="muted-soft mt-2 text-[0.7rem] uppercase tracking-[0.16em]">{s.label}</dt>
-            </div>
-          ))}
-        </dl>
+    <!-- Copy + figures -->
+    <div class="mt-16 grid gap-12 lg:mt-20 lg:grid-cols-[1.1fr_0.9fr] lg:gap-24">
+      <div class="prose-lux space-y-5">
+        {concept.paragraphs.map((p, i) => (
+          <p class="body-lg muted" data-reveal="rise" data-delay={0.05 + i * 0.1}>{p}</p>
+        ))}
       </div>
 
-      <!-- image: floats via multiply, clip reveal + parallax -->
-      <div class="relative">
-        <div data-img-reveal class="relative aspect-[7/5] w-full overflow-hidden">
-          <div data-parallax="0.1" class="absolute inset-[-6%]">
-            <Image
-              src={aston}
-              alt="Aston Martin DB de profil, illustration aquarelle premium"
-              widths={[600, 900, 1200, 1408]}
-              sizes="(max-width: 1024px) 100vw, 55vw"
-              class="h-full w-full object-contain mix-blend-multiply"
-            />
+      <dl class="flex flex-col justify-end gap-7" data-stagger>
+        {concept.stats.map((s) => (
+          <div class="flex items-baseline justify-between border-b border-racing/10 pb-5" data-stagger-item>
+            <dt class="muted-soft text-[0.7rem] uppercase tracking-[0.16em]">{s.label}</dt>
+            <dd class="font-serif text-4xl font-light text-racing sm:text-5xl">
+              <span data-count={s.value} data-suffix={s.suffix}>0{s.suffix}</span>
+            </dd>
           </div>
-        </div>
-        <span class="index-num absolute -bottom-2 left-0 text-gold-dark" aria-hidden="true">Aston Martin — profil</span>
-      </div>
+        ))}
+      </dl>
     </div>
   </div>
 </section>

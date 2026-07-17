@@ -42,13 +42,10 @@ const dark = tone === 'ink';
     {
       (eyebrow || titleLines.length > 0) && (
         <header class="mb-16 sm:mb-20">
-          {(eyebrow || index) && (
+          {eyebrow && (
             <div class="mb-7 flex items-center gap-4" data-reveal="rise">
-              {index && (
-                <span class={`index-num ${dark ? 'text-gold' : 'text-gold-dark'}`}>({index})</span>
-              )}
               <span class={`h-px w-10 ${dark ? 'bg-gold/50' : 'bg-gold-dark/50'}`} />
-              {eyebrow && <span class="eyebrow">{eyebrow}</span>}
+              <span class="eyebrow">{eyebrow}</span>
             </div>
           )}
           {titleLines.length > 0 && (

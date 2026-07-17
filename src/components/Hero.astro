@@ -2,16 +2,18 @@
 import { Image } from 'astro:assets';
 import Button from './Button.astro';
 import Marquee from './Marquee.astro';
-import { hero, cta, site } from '../data/content';
+import { hero, cta } from '../data/content';
 import porsche from '../assets/images/porsche.png';
+
+const words = (s: string) => s.split(' ');
 ---
 
 <section
   data-hero
   class="relative flex min-h-[100svh] flex-col overflow-hidden bg-paper pt-[var(--header-h)]"
 >
-  <!-- Car: bleeds off the right, melts into the page on the left -->
-  <div class="pointer-events-none absolute inset-y-0 right-0 z-0 w-[72%] sm:w-[62%] lg:w-[56%]">
+  <!-- Car: right side, bleeding off the edge, melting into the paper -->
+  <div class="pointer-events-none absolute inset-y-0 right-0 z-0 hidden w-[58%] lg:block">
     <div data-hero-media class="absolute inset-0 flex items-center">
       <Image
         src={porsche}
@@ -26,86 +28,61 @@ import porsche from '../assets/images/porsche.png';
     <!-- soft left fade for the type overlap zone -->
     <div
       class="absolute inset-0"
-      style="background: linear-gradient(90deg, var(--color-paper) 0%, color-mix(in srgb, var(--color-paper) 60%, transparent) 22%, transparent 46%);"
+      style="background: linear-gradient(90deg, var(--color-paper) 0%, color-mix(in srgb, var(--color-paper) 60%, transparent) 20%, transparent 45%);"
       aria-hidden="true"
     ></div>
   </div>
 
-  <!-- rotated edge label -->
-  <span
-    class="eyebrow absolute left-4 top-1/2 z-10 hidden -translate-y-1/2 -rotate-90 whitespace-nowrap lg:block"
-    aria-hidden="true"
-  >
-    Est. — France &amp; Europe
-  </span>
-
-  <!-- Main editorial block -->
+  <!-- Text: left column -->
   <div class="relative z-10 mx-auto flex w-full max-w-[1440px] flex-1 flex-col px-6 sm:px-10 lg:px-14">
-    <!-- meta row -->
-    <div class="flex items-center justify-between pt-6 text-racing" data-reveal="rise">
-      <span class="eyebrow">{hero.eyebrow}</span>
-      <span class="index-num hidden text-gold-dark sm:block">(00) — Accueil</span>
-    </div>
-
     <div class="flex flex-1 flex-col justify-center py-10">
-      <h1 class="display text-racing" data-split>
-        <span class="line-mask"><span class="line-inner">{hero.titleTop}</span></span>
-        <span class="line-mask">
-          <span class="line-inner italic-display pl-[0.5em] text-gold-dark">{hero.titleAccent}</span>
+      <div class="mb-8 flex items-center gap-4" data-reveal="rise">
+        <span class="h-px w-12 bg-gold-dark/60"></span>
+        <span class="eyebrow">{hero.eyebrow}</span>
+      </div>
+
+      <h1 class="display max-w-[13ch] text-racing" data-word-reveal>
+        <span class="block">
+          {words(hero.titleTop).map((w, i, arr) => (
+            <span class="w-mask"><span class="w-inner">{w}{i < arr.length - 1 ? ' ' : ''}</span></span>
+          ))}
         </span>
-        <span class="line-mask"><span class="line-inner">{hero.titleBottom}</span></span>
+        <span class="block">
+          {words(hero.titleAccent).map((w, i, arr) => (
+            <span class="w-mask"><span class="w-inner italic-display text-gold-dark">{w}{i < arr.length - 1 ? ' ' : ''}</span></span>
+          ))}
+        </span>
       </h1>
 
-      <div class="mt-10 flex max-w-[54ch] flex-col gap-8 sm:flex-row sm:items-end sm:justify-between">
-        <p class="body-lg muted max-w-[34ch]" data-reveal="rise" data-delay="0.2">
-          {hero.lead}
-        </p>
-        <div class="flex shrink-0 flex-col gap-3 sm:flex-row" data-reveal="rise" data-delay="0.3">
-          <Button href={cta.primary.href} variant="solid">{cta.primary.label}</Button>
-          <Button href={cta.secondary.href} variant="outline">{cta.secondary.label}</Button>
-        </div>
+      <p class="body-lg muted mt-8 max-w-[42ch]" data-reveal="rise" data-delay="0.5">
+        {hero.lead}
+      </p>
+
+      <div class="mt-9 flex flex-col gap-3 sm:flex-row" data-reveal="rise" data-delay="0.65">
+        <Button href={cta.primary.href} variant="solid">{cta.primary.label}</Button>
+        <Button href={cta.secondary.href} variant="outline">{cta.secondary.label}</Button>
       </div>
+    </div>
+
+    <!-- Mobile / tablet: car below the text -->
+    <div class="relative mb-6 w-full lg:hidden">
+      <Image
+        src={porsche}
+        alt=""
+        aria-hidden="true"
+        widths={[600, 900, 1200]}
+        sizes="100vw"
+        class="h-auto w-full object-contain mix-blend-multiply"
+      />
     </div>
   </div>
 
   <!-- Kinetic marquee band -->
-  <div class="relative z-10 border-y border-racing/10 bg-paper/60 py-4 backdrop-blur-sm">
+  <div class="relative z-10 mt-auto border-y border-racing/10 py-4">
     <Marquee
       items={hero.marquee}
-      duration={38}
-      class="font-serif text-2xl font-light italic text-racing sm:text-3xl"
+      duration={55}
+      class="font-serif text-2xl font-light italic text-racing/80 sm:text-3xl"
     />
   </div>
-
-  <!-- Scroll indicator -->
-  <a
-    href="#concept"
-    class="group absolute bottom-24 right-6 z-20 hidden flex-col items-center gap-2 text-racing/50 transition-colors hover:text-gold-dark lg:flex"
-    aria-label={hero.scrollHint}
-  >
-    <span class="eyebrow text-[0.55rem] tracking-[0.4em]">{hero.scrollHint}</span>
-    <span class="relative block h-10 w-px overflow-hidden bg-racing/20">
-      <span class="scroll-bead absolute left-0 top-0 h-4 w-px bg-gold-dark"></span>
-    </span>
-  </a>
 </section>
-
-<style>
-  .scroll-bead {
-    animation: bead 2.2s var(--ease-lux) infinite;
-  }
-  @keyframes bead {
-    0% {
-      transform: translateY(-100%);
-    }
-    60%,
-    100% {
-      transform: translateY(250%);
-    }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .scroll-bead {
-      animation: none;
-    }
-  }
-</style>

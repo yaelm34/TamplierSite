@@ -10,11 +10,13 @@ const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT ?? '';
     <!-- Coordinates -->
     <div>
       <div class="mb-6 flex items-center gap-4" data-reveal="rise">
-        <span class="index-num text-gold-dark">({contact.index})</span>
         <span class="h-px w-10 bg-gold-dark/50"></span>
         <span class="eyebrow">{contact.eyebrow}</span>
       </div>
-      <SplitText lines={[contact.title]} class="headline max-w-[12ch]" />
+      <h2 class="display" data-split>
+        <span class="line-mask"><span class="line-inner">{contact.title}</span></span>
+        <span class="line-mask"><span class="line-inner italic-display text-gold-dark">{contact.titleAccent}</span></span>
+      </h2>
       <p class="body-lg muted mt-8 max-w-[38ch]" data-reveal="rise" data-delay="0.1">
         {contact.intro}
       </p>
