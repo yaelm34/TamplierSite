@@ -1,8 +1,9 @@
 ---
 import { Image } from 'astro:assets';
 import SplitText from './SplitText.astro';
-import { concept } from '../data/content';
+import { getContent } from '../data/content';
 import aston from '../assets/images/aston.png';
+const { concept, ui } = getContent(Astro.currentLocale);
 ---
 
 <section id="concept" class="relative overflow-hidden bg-paper py-24 text-racing sm:py-32 lg:py-40" data-parallax-scope>
@@ -19,22 +20,24 @@ import aston from '../assets/images/aston.png';
       </p>
     </div>
 
-    <!-- The artwork — full width, breathing inside its own space -->
-    <div class="mt-16 lg:mt-20">
-      <div data-img-reveal class="relative aspect-[16/8] w-full overflow-hidden sm:aspect-[21/9]">
-        <div data-parallax="0.07" class="absolute inset-[-8%]">
+    <!-- The artwork — détourée (PNG transparent), cadre ajusté au ratio de la voiture
+         pour éviter les grands vides ; largeur limitée pour garder une taille mesurée. -->
+    <div class="mx-auto mt-10 max-w-[920px] lg:mt-12">
+      <div data-img-reveal class="relative aspect-[14/5] w-full overflow-hidden">
+        <div class="absolute inset-0">
           <Image
             src={aston}
-            alt="Aston Martin DB de profil, illustration aquarelle premium"
-            widths={[700, 1000, 1400, 1408]}
-            sizes="(max-width: 1440px) 100vw, 1360px"
+            alt={ui.conceptArtAlt}
+            widths={[700, 920, 1400]}
+            sizes="(max-width: 920px) 100vw, 920px"
+            format="png"
             class="h-full w-full object-contain"
           />
         </div>
       </div>
       <div class="mt-1 flex items-center justify-between border-t border-racing/10 pt-4">
-        <span class="caption muted-soft">Aston Martin DB — profil</span>
-        <span class="caption text-gold-dark">France &amp; Europe</span>
+        <span class="caption muted-soft">{ui.conceptCaption}</span>
+        <span class="caption text-gold-dark">{ui.region}</span>
       </div>
     </div>
 

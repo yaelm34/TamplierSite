@@ -1,7 +1,8 @@
 ---
 import SplitText from './SplitText.astro';
 import Button from './Button.astro';
-import { contact, site } from '../data/content';
+import { getContent, site } from '../data/content';
+const { contact, ui } = getContent(Astro.currentLocale);
 const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT ?? '';
 ---
 
@@ -25,19 +26,19 @@ const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT ?? '';
 
       <dl class="space-y-7" data-stagger>
         <div data-stagger-item>
-          <dt class="eyebrow mb-1">Interlocuteur</dt>
+          <dt class="eyebrow mb-1">{ui.contactInterlocutor}</dt>
           <dd class="font-serif text-2xl font-light text-racing">{site.founder}</dd>
-          <dd class="muted text-sm">{site.founderRole}</dd>
+          <dd class="muted text-sm">{ui.founderRole}</dd>
         </div>
         <div data-stagger-item>
-          <dt class="eyebrow mb-1">Siège social</dt>
+          <dt class="eyebrow mb-1">{ui.contactHeadOffice}</dt>
           <dd class="muted text-sm">
             {site.address.street}<br />
             {site.address.postalCode} {site.address.locality} / {site.address.region}
           </dd>
         </div>
         <div data-stagger-item>
-          <dt class="eyebrow mb-1">Téléphone</dt>
+          <dt class="eyebrow mb-1">{ui.contactPhone}</dt>
           <dd>
             <a class="text-lg text-racing transition-colors hover:text-gold-dark" href={`tel:${site.phoneIntl}`}>
               {site.phone}
@@ -45,28 +46,11 @@ const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT ?? '';
           </dd>
         </div>
         <div data-stagger-item>
-          <dt class="eyebrow mb-1">E-mail</dt>
+          <dt class="eyebrow mb-1">{ui.contactEmail}</dt>
           <dd>
             <a class="break-all text-lg text-racing transition-colors hover:text-gold-dark" href={`mailto:${site.email}`}>
               {site.email}
             </a>
-          </dd>
-        </div>
-        <div data-stagger-item>
-          <dt class="eyebrow mb-2">Réseaux</dt>
-          <dd class="flex flex-wrap gap-3">
-            {
-              site.socials.map((s) => (
-                <a
-                  href={s.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="border border-racing/20 px-3 py-1.5 text-[0.7rem] uppercase tracking-wider text-racing/70 transition-colors hover:border-gold-dark hover:text-gold-dark"
-                >
-                  {s.name}
-                </a>
-              ))
-            }
           </dd>
         </div>
       </dl>
@@ -83,34 +67,34 @@ const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT ?? '';
       >
         <div class="field">
           <input id="name" name="name" type="text" placeholder=" " required autocomplete="name" />
-          <label for="name">Nom</label>
+          <label for="name">{ui.fieldName}</label>
         </div>
         <div class="field">
           <input id="email" name="email" type="email" placeholder=" " required autocomplete="email" />
-          <label for="email">E-mail</label>
+          <label for="email">{ui.fieldEmail}</label>
         </div>
         <div class="field">
           <input id="phone" name="phone" type="tel" placeholder=" " autocomplete="tel" />
-          <label for="phone">Téléphone</label>
+          <label for="phone">{ui.fieldPhone}</label>
         </div>
         <div class="field">
           <select id="pack" name="pack" required>
             <option value="" selected hidden></option>
             {contact.packOptions.map((o) => <option value={o}>{o}</option>)}
           </select>
-          <label for="pack">Pack souhaité</label>
+          <label for="pack">{ui.fieldPack}</label>
         </div>
         <div class="field">
           <input id="budget" name="budget" type="text" placeholder=" " inputmode="numeric" />
-          <label for="budget">Budget</label>
+          <label for="budget">{ui.fieldBudget}</label>
         </div>
         <div class="field">
           <input id="vehicle" name="vehicle" type="text" placeholder=" " />
-          <label for="vehicle">Véhicule recherché</label>
+          <label for="vehicle">{ui.fieldVehicle}</label>
         </div>
         <div class="field sm:col-span-2">
           <textarea id="message" name="message" placeholder=" " rows="4"></textarea>
-          <label for="message">Message</label>
+          <label for="message">{ui.fieldMessage}</label>
         </div>
 
         <!-- honeypot -->
@@ -118,9 +102,9 @@ const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT ?? '';
 
         <div class="mt-6 flex flex-col gap-4 sm:col-span-2 sm:flex-row sm:items-center sm:justify-between">
           <p class="muted-soft max-w-[34ch] text-xs" data-form-status role="status" aria-live="polite">
-            Réponse personnelle sous 24 h.
+            {ui.formReply}
           </p>
-          <Button type="submit" variant="solid" magnetic={false}>Envoyer ma demande</Button>
+          <Button type="submit" variant="solid" magnetic={false}>{ui.formSubmit}</Button>
         </div>
       </form>
     </div>
@@ -132,6 +116,18 @@ const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT ?? '';
   define:vars={{
     successText: contact.fields.successText,
     errorText: contact.fields.errorText,
+    sendingText: ui.formSending,
+    mailSubject: ui.mailSubject,
+    mailOpening: ui.mailOpening,
+    mailToDefine: ui.mailToDefine,
+    L: {
+      name: ui.fieldName,
+      email: ui.fieldEmail,
+      phone: ui.fieldPhone,
+      pack: ui.fieldPack,
+      budget: ui.fieldBudget,
+      vehicle: ui.fieldVehicle,
+    },
   }}
 >
   const form = document.querySelector('[data-contact-form]');
@@ -164,7 +160,7 @@ const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT ?? '';
 
       if (endpoint) {
         try {
-          setStatus('Envoi en cours…', true);
+          setStatus(sendingText, true);
           const res = await fetch(endpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
@@ -179,13 +175,13 @@ const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT ?? '';
         }
       } else {
         // mailto fallback
-        const subject = encodeURIComponent(`Demande de projet — ${data.pack || 'à définir'}`);
+        const subject = encodeURIComponent(`${mailSubject} — ${data.pack || mailToDefine}`);
         const body = encodeURIComponent(
-          `Nom : ${data.name}\nE-mail : ${data.email}\nTéléphone : ${data.phone || '—'}\n` +
-            `Pack : ${data.pack || '—'}\nBudget : ${data.budget || '—'}\nVéhicule : ${data.vehicle || '—'}\n\n${data.message || ''}`
+          `${L.name} : ${data.name}\n${L.email} : ${data.email}\n${L.phone} : ${data.phone || '—'}\n` +
+            `${L.pack} : ${data.pack || '—'}\n${L.budget} : ${data.budget || '—'}\n${L.vehicle} : ${data.vehicle || '—'}\n\n${data.message || ''}`
         );
         window.location.href = `mailto:${mailto}?subject=${subject}&body=${body}`;
-        setStatus('Votre logiciel de messagerie va s’ouvrir…', true);
+        setStatus(mailOpening, true);
       }
     });
   }

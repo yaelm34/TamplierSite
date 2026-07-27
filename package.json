@@ -4,10 +4,10 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview",
-    "astro": "astro"
+    "dev": "node --require ./styletext-patch.cjs ./node_modules/astro/astro.js dev",
+    "build": "node --require ./styletext-patch.cjs ./node_modules/astro/astro.js build",
+    "preview": "node --require ./styletext-patch.cjs ./node_modules/astro/astro.js preview",
+    "astro": "node --require ./styletext-patch.cjs ./node_modules/astro/astro.js"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.2.1",

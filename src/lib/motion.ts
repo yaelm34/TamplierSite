@@ -8,6 +8,11 @@ import Lenis from 'lenis';
 
 gsap.registerPlugin(ScrollTrigger);
 
+// Sur mobile, l'apparition/disparition de la barre d'URL compte comme un resize
+// et déclenche un refresh complet de TOUS les ScrollTrigger en plein scroll —
+// source de saccades très visible. La hauteur ne change pas vraiment : on ignore.
+ScrollTrigger.config({ ignoreMobileResize: true });
+
 const reduced =
   typeof window !== 'undefined' &&
   window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -20,7 +25,7 @@ const isTouch =
 function initLenis() {
   if (reduced) return;
   const lenis = new Lenis({
-    lerp: 0.08,
+    lerp: 0.1,
     wheelMultiplier: 1,
     smoothWheel: true,
   });
@@ -128,7 +133,7 @@ function parallax() {
         trigger: el.closest('[data-parallax-scope]') || el,
         start: 'top bottom',
         end: 'bottom top',
-        scrub: true,
+        scrub: 1,
       },
     });
   });
@@ -286,53 +291,100 @@ function glow() {
   document.querySelectorAll<HTMLElement>('.glow-follow').forEach((el) => {
     const parent = el.parentElement;
     if (!parent) return;
+    // Écriture des variables CSS regroupée dans une frame : un pointermove peut
+    // se déclencher plusieurs fois par frame, et chaque `setProperty` invalide le
+    // style du bloc — de quoi hacher le scroll sur les sections sombres.
+    let pending = false;
+    let px = 0;
+    let py = 0;
     parent.addEventListener('pointermove', (e) => {
-      const r = parent.getBoundingClientRect();
-      el.style.setProperty('--gx', `${e.clientX - r.left}px`);
-      el.style.setProperty('--gy', `${e.clientY - r.top}px`);
-      el.style.setProperty('--go', '1');
+      px = e.clientX;
+      py = e.clientY;
+      if (pending) return;
+      pending = true;
+      requestAnimationFrame(() => {
+        pending = false;
+        const r = parent.getBoundingClientRect();
+        el.style.setProperty('--gx', `${px - r.left}px`);
+        el.style.setProperty('--gy', `${py - r.top}px`);
+        el.style.setProperty('--go', '1');
+      });
     });
     parent.addEventListener('pointerleave', () => el.style.setProperty('--go', '0'));
   });
 }
 
-/* ---------- 11. Custom magnetic cursor ---------- */
-function cursor() {
+/* ---------- 11. Magnetic buttons ----------
+   Le curseur personnalisé (anneau + point qui suivaient la souris) a été retiré :
+   `mix-blend-mode: difference` sur un élément `position: fixed` en z-index 9999
+   force le navigateur à recomposer tout le plan à chaque frame — c'est le même
+   piège que celui documenté sur `.grain`, et il coûtait la fluidité du scroll.
+   Seul l'effet magnétique des boutons est conservé, et uniquement sur les
+   éléments qui le demandent (au lieu d'écouter tous les `a` et `button`). */
+function magnetic() {
   if (reduced || isTouch) return;
-  const dot = document.querySelector<HTMLElement>('.cursor-dot');
-  const ring = document.querySelector<HTMLElement>('.cursor-ring');
-  if (!dot || !ring) return;
 
-  const mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-  const ringPos = { ...mouse };
-  window.addEventListener('pointermove', (e) => {
-    mouse.x = e.clientX;
-    mouse.y = e.clientY;
-    dot.style.transform = `translate(${e.clientX}px, ${e.clientY}px) translate(-50%,-50%)`;
-  });
-  gsap.ticker.add(() => {
-    ringPos.x += (mouse.x - ringPos.x) * 0.18;
-    ringPos.y += (mouse.y - ringPos.y) * 0.18;
-    ring.style.transform = `translate(${ringPos.x}px, ${ringPos.y}px) translate(-50%,-50%)`;
-  });
+  // Amplitude : fraction de la distance curseur ↔ centre, puis PLAFOND en pixels.
+  // MAX_X = 6 px, soit la MOITIÉ de l'écart entre deux CTA voisins (`gap-3`, 12 px).
+  // En passant vite d'un bouton à l'autre, le premier revient encore au repos
+  // pendant que le second s'écarte : c'est le seul instant où les deux bougent en
+  // même temps. Plafonner à la demi-gouttière rend leur rencontre impossible,
+  // quel que soit le moment où la souris passe de l'un à l'autre.
+  const PULL_X = 0.16;
+  const PULL_Y = 0.22;
+  const MAX_X = 6;
+  const MAX_Y = 8;
+  const clamp = (v: number, max: number) => (v > max ? max : v < -max ? -max : v);
 
-  document
-    .querySelectorAll<HTMLElement>('a, button, [data-magnetic]')
-    .forEach((el) => {
-      el.addEventListener('pointerenter', () => ring.classList.add('is-active'));
-      el.addEventListener('pointerleave', () => {
-        ring.classList.remove('is-active');
-        gsap.to(el, { x: 0, y: 0, duration: 0.5, ease: 'elastic.out(1,0.4)' });
-      });
-      if (el.hasAttribute('data-magnetic')) {
-        el.addEventListener('pointermove', (e) => {
-          const r = el.getBoundingClientRect();
-          const mx = e.clientX - (r.left + r.width / 2);
-          const my = e.clientY - (r.top + r.height / 2);
-          gsap.to(el, { x: mx * 0.25, y: my * 0.35, duration: 0.6, ease: 'power3.out' });
-        });
-      }
+  document.querySelectorAll<HTMLElement>('[data-magnetic]').forEach((el) => {
+    // UN seul tween par axe, réutilisé : `quickTo` remet à jour sa cible au lieu
+    // de créer un tween par frame. Deux tweens concurrents sur la même propriété
+    // se disputaient l'élément — c'est ce qui le laissait parfois décalé, donc
+    // superposé au bouton voisin, quand la souris sortait pendant une animation.
+    const xTo = gsap.quickTo(el, 'x', { duration: 0.55, ease: 'power3.out' });
+    const yTo = gsap.quickTo(el, 'y', { duration: 0.55, ease: 'power3.out' });
+
+    let frame = 0;
+    let px = 0;
+    let py = 0;
+
+    const apply = () => {
+      frame = 0;
+      const r = el.getBoundingClientRect();
+      // ⚠️ `getBoundingClientRect` mesure l'élément DÉJÀ déplacé. En s'en servant
+      // tel quel, le centre de référence suivait le bouton : plus il s'éloignait,
+      // plus l'écart mesuré restait grand, et le déplacement s'auto-entretenait.
+      // On retranche donc la translation en cours pour retrouver le centre AU REPOS.
+      const cx = r.left + r.width / 2 - (gsap.getProperty(el, 'x') as number);
+      const cy = r.top + r.height / 2 - (gsap.getProperty(el, 'y') as number);
+      xTo(clamp((px - cx) * PULL_X, MAX_X));
+      yTo(clamp((py - cy) * PULL_Y, MAX_Y));
+    };
+
+    el.addEventListener('pointermove', (e) => {
+      px = e.clientX;
+      py = e.clientY;
+      if (!frame) frame = requestAnimationFrame(apply);
     });
+
+    const release = () => {
+      // La frame en attente est annulée : sinon elle se déclenchait APRÈS le
+      // retour au repos et redéplaçait le bouton une fois la souris partie.
+      if (frame) {
+        cancelAnimationFrame(frame);
+        frame = 0;
+      }
+      // Retour sans rebond : l'`elastic` précédent dépassait le point d'origine,
+      // ce qui se lisait comme un chevauchement entre deux boutons voisins.
+      xTo(0);
+      yTo(0);
+    };
+
+    el.addEventListener('pointerleave', release);
+    el.addEventListener('pointercancel', release);
+    // Filet : si le bouton glisse hors du curseur, `pointerleave` peut manquer.
+    el.addEventListener('blur', release);
+  });
 }
 
 /* ---------- 12. Preloader curtain ---------- */
@@ -384,7 +436,7 @@ export function boot() {
   preloader();
   initLenis();
   header();
-  cursor();
+  magnetic();
   hero();
   heroWords();
   wordScrub();

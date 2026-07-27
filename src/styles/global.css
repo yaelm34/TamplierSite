@@ -302,8 +302,8 @@ body {
   display: inline-block;
   overflow: hidden;
   vertical-align: bottom;
-  padding-bottom: 0.08em; /* keep descenders visible */
-  margin-bottom: -0.08em;
+  padding-bottom: 0.2em; /* keep descenders (g, p, j…) visible — serif display needs room */
+  margin-bottom: -0.2em;
 }
 .w-inner {
   display: inline-block;
@@ -341,51 +341,16 @@ body {
   line-height: 0.8;
 }
 
-/* Custom cursor (green, no blend for white bg) */
-.cursor-dot,
-.cursor-ring {
-  position: fixed;
-  top: 0;
-  left: 0;
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 9999;
-  mix-blend-mode: difference; /* auto-adapts to light & dark surfaces */
-}
-.cursor-dot {
-  width: 6px;
-  height: 6px;
-  background: #f4e6b0;
-  transform: translate(-50%, -50%);
-}
-.cursor-ring {
-  width: 34px;
-  height: 34px;
-  border: 1px solid rgba(255, 255, 255, 0.85);
-  transform: translate(-50%, -50%);
-  transition: width 0.3s var(--ease-lux), height 0.3s var(--ease-lux),
-    background-color 0.3s var(--ease-lux);
-}
-.cursor-ring.is-active {
-  width: 58px;
-  height: 58px;
-  background: rgba(255, 255, 255, 0.15);
-}
-@media (hover: none), (pointer: coarse) {
-  .cursor-dot,
-  .cursor-ring {
-    display: none !important;
-  }
-}
-
 /* Global grain */
 .grain {
   position: fixed;
   inset: 0;
   z-index: 60;
   pointer-events: none;
-  opacity: 0.04;
-  mix-blend-mode: multiply;
+  opacity: 0.05;
+  /* NB : pas de mix-blend-mode ici — un blend sur un overlay fixe plein écran
+     force un re-compositing à chaque frame de scroll (saccades). En normal
+     compositing, la couche est simplement superposée (fluide). */
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 

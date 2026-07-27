@@ -33,7 +33,7 @@ const dark = tone === 'ink';
 
 <section
   id={id}
-  class={`relative overflow-hidden py-24 sm:py-32 lg:py-40 ${toneClass[tone]} ${cls}`}
+  class={`relative overflow-hidden py-20 sm:py-32 lg:py-40 ${toneClass[tone]} ${cls}`}
   data-parallax-scope
 >
   {glow && dark && <span class="glow-follow" aria-hidden="true"></span>}
@@ -41,7 +41,7 @@ const dark = tone === 'ink';
   <div class={container ? 'relative mx-auto w-full max-w-[1440px] px-6 sm:px-10 lg:px-14' : 'relative'}>
     {
       (eyebrow || titleLines.length > 0) && (
-        <header class="mb-16 sm:mb-20">
+        <header class="mb-12 sm:mb-20">
           {eyebrow && (
             <div class="mb-7 flex items-center gap-4" data-reveal="rise">
               <span class={`h-px w-10 ${dark ? 'bg-gold/50' : 'bg-gold-dark/50'}`} />

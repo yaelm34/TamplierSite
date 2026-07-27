@@ -1,7 +1,8 @@
 ---
 import Section from './Section.astro';
 import Icon from './Icon.astro';
-import { trust } from '../data/content';
+import { getContent } from '../data/content';
+const { trust } = getContent(Astro.currentLocale);
 ---
 
 <Section id="confiance" tone="paper" eyebrow={trust.eyebrow} index={trust.index} title={trust.title}>

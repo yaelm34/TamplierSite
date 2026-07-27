@@ -2,9 +2,10 @@
 import { Image } from 'astro:assets';
 import Button from './Button.astro';
 import Marquee from './Marquee.astro';
-import { hero, cta } from '../data/content';
+import { getContent } from '../data/content';
 import banner from '../assets/images/banner.png';
 
+const { hero, cta, ui } = getContent(Astro.currentLocale);
 const words = (s: string) => s.split(' ');
 ---
 
@@ -13,16 +14,17 @@ const words = (s: string) => s.split(' ');
   class="relative flex min-h-[100svh] flex-col overflow-hidden bg-paper pt-[var(--header-h)]"
 >
   <!-- Car: right side, bleeding off the edge, melting into the paper -->
-  <div class="pointer-events-none absolute inset-y-0 right-0 z-0 hidden w-[58%] lg:block">
-    <div data-hero-media class="absolute inset-0 flex items-center">
+  <div class="pointer-events-none absolute inset-y-0 right-0 z-0 hidden w-[54%] lg:block">
+    <div data-hero-media class="absolute inset-0 flex items-center justify-center px-[2vw]">
       <Image
         src={banner}
-        alt="Véhicule d'exception, illustration aquarelle — TAMPLIER Auto Sourcing"
+        alt={ui.heroBannerAlt}
         widths={[768, 1200, 1600, 2000]}
-        sizes="60vw"
+        sizes="54vw"
+        format="png"
         loading="eager"
         fetchpriority="high"
-        class="h-auto w-full object-contain"
+        class="mx-auto h-auto w-[88%] object-contain"
       />
     </div>
     <!-- soft left fade for the type overlap zone -->
@@ -72,6 +74,7 @@ const words = (s: string) => s.split(' ');
         aria-hidden="true"
         widths={[600, 900, 1200]}
         sizes="100vw"
+        format="png"
         class="h-auto w-full object-contain"
       />
     </div>

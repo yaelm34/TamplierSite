@@ -1,7 +1,8 @@
 ---
 import Section from './Section.astro';
 import Button from './Button.astro';
-import { offers, cta } from '../data/content';
+import { getContent } from '../data/content';
+const { offers, cta } = getContent(Astro.currentLocale);
 ---
 
 <Section id="offres" tone="paper-warm" eyebrow={offers.eyebrow} index={offers.index} title={offers.title}>
@@ -12,21 +13,29 @@ import { offers, cta } from '../data/content';
       offers.packs.map((pack) => {
         const dark = pack.featured;
         return (
-          <article
+          // Enveloppe NON rognée : le badge déborde volontairement au-dessus de la
+          // carte, or `.sweep` porte `overflow: hidden` (indispensable au reflet
+          // doré au survol) et le tronquait. Le badge vit donc ici, la carte garde
+          // son overflow. Le décalage vertical de la carte vedette passe aussi sur
+          // l'enveloppe, sinon le badge se désolidariserait d'elle.
+          <div
             data-stagger-item
-            class={`sweep group relative flex flex-col p-8 transition-transform duration-700 ease-[var(--ease-lux)] sm:p-9
-              ${
-                dark
-                  ? 'on-dark bg-racing text-ivory lg:-mt-6 lg:mb-6'
-                  : 'border border-racing/12 bg-paper text-racing hover:border-racing/30'
-              }`}
+            class={`relative flex ${dark ? 'lg:-mt-6 lg:mb-6' : ''}`}
           >
             {dark && pack.badge && (
-              <span class="absolute -top-3 left-8 bg-gold px-4 py-1 text-[0.6rem] font-semibold uppercase tracking-[0.2em] text-racing-deep">
+              <span class="absolute -top-3.5 left-1/2 z-20 -translate-x-1/2 whitespace-nowrap rounded-full bg-gold px-5 py-1.5 text-[0.72rem] font-bold uppercase tracking-[0.12em] text-racing-deep shadow-lg shadow-racing-deep/40 ring-1 ring-gold-light/50">
                 {pack.badge}
               </span>
             )}
 
+            <article
+              class={`sweep group relative flex w-full flex-col p-8 transition-transform duration-700 ease-[var(--ease-lux)] sm:p-9
+                ${
+                  dark
+                    ? 'on-dark bg-racing text-ivory'
+                    : 'border border-racing/12 bg-paper text-racing hover:border-racing/30'
+                }`}
+            >
             <header class="relative z-10">
               <h3 class="subhead">{pack.name}</h3>
               <p class={`mt-2 min-h-[2.6em] text-sm italic ${dark ? 'text-gold-light/90' : 'text-gold-dark'}`}>{pack.tag}</p>
@@ -51,10 +60,11 @@ import { offers, cta } from '../data/content';
 
             <div class="relative z-10 mt-9">
               <Button href={cta.primary.href} variant={dark ? 'gold' : 'outline'} class="w-full" magnetic={false}>
-                {dark ? 'Choisir Premium' : 'Demander un devis'}
+                {dark ? offers.choosePremium : offers.requestQuote}
               </Button>
             </div>
-          </article>
+            </article>
+          </div>
         );
       })
     }

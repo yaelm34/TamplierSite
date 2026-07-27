@@ -3,7 +3,7 @@ import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import Preloader from '../components/Preloader.astro';
-import { site, seo } from '../data/content';
+import { site, legal, getContent } from '../data/content';
 
 interface Props {
   title?: string;
@@ -11,54 +11,156 @@ interface Props {
   showChrome?: boolean; // header + footer
   preload?: boolean;
 }
+const c = getContent(Astro.currentLocale);
+const cur: 'fr' | 'en' = Astro.currentLocale === 'en' ? 'en' : 'fr';
 const {
-  title = seo.title,
-  description = seo.description,
+  title = c.seo.title,
+  description = c.seo.description,
   showChrome = true,
   preload = true,
 } = Astro.props;
 
-const canonical = new URL(Astro.url.pathname, site.url).href;
+const path = Astro.url.pathname;
+const canonical = new URL(path, site.url).href;
 const ogUrl = new URL('/og.jpg', site.url).href;
 
+// URLs équivalentes FR / EN de la page courante (pour canonical + hreflang).
+const frPath = cur === 'en' ? path.replace(/^\/en(\/|$)/, '/') : path;
+const enPath = cur === 'en' ? path : path === '/' ? '/en/' : `/en${path}`;
+const altUrls = {
+  fr: new URL(frPath, site.url).href,
+  en: new URL(enPath, site.url).href,
+};
+const altOgLocale = cur === 'en' ? 'fr_FR' : 'en_US';
+
+const logoUrl = new URL('/icon-512.png', site.url).href;
+
+// Prix affichés sur la page ↔ prix déclarés ici : Google compare les deux et
+// déclasse une donnée structurée que la page ne confirme pas. On les DÉRIVE donc
+// du contenu (« 1 990 € TTC » → 1990) plutôt que de les recopier à la main.
+const priceOf = (p: string): number | null => {
+  const digits = p.replace(/[^\d,]/g, '').replace(',', '.');
+  const n = Number.parseFloat(digits);
+  return Number.isFinite(n) && n > 0 ? n : null;
+};
+
+const areaServed = [
+  { '@type': 'Country', name: 'France' },
+  { '@type': 'Place', name: 'Europe' },
+];
+
+// Un seul graphe relié par @id, au lieu d'un objet isolé : Google peut alors
+// rattacher la page à l'entreprise et l'entreprise à ses prestations.
 const jsonLd = {
   '@context': 'https://schema.org',
-  '@type': 'AutoDealer',
-  name: site.name,
-  description: seo.description,
-  url: site.url,
-  telephone: site.phoneIntl,
-  email: site.email,
-  image: ogUrl,
-  priceRange: '€€€€',
-  founder: { '@type': 'Person', name: site.founder },
-  address: {
-    '@type': 'PostalAddress',
-    streetAddress: site.address.street,
-    postalCode: site.address.postalCode,
-    addressLocality: site.address.locality,
-    addressRegion: site.address.region,
-    addressCountry: site.address.country,
-  },
-  areaServed: [
-    { '@type': 'Country', name: 'France' },
-    { '@type': 'Place', name: 'Europe' },
+  '@graph': [
+    {
+      '@type': 'AutoDealer',
+      '@id': `${site.url}/#business`,
+      name: site.name,
+      legalName: site.legalName,
+      description: c.seo.description,
+      url: site.url,
+      telephone: site.phoneIntl,
+      email: site.email,
+      image: ogUrl,
+      logo: { '@type': 'ImageObject', url: logoUrl, width: 512, height: 512 },
+      priceRange: '€€€€',
+      currenciesAccepted: 'EUR',
+      vatID: legal.tva,
+      founder: { '@type': 'Person', name: site.founder },
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: site.address.street,
+        postalCode: site.address.postalCode,
+        addressLocality: site.address.locality,
+        addressRegion: site.address.region,
+        addressCountry: site.address.country,
+      },
+      areaServed,
+      knowsLanguage: ['fr', 'en'],
+      // Pas de `sameAs` : il n'y a pas encore de compte social vérifiable. Un
+      // sameAs vers la page d'accueil d'un réseau n'identifie rien et affaiblit
+      // le reste du balisage.
+      hasOfferCatalog: {
+        '@type': 'OfferCatalog',
+        name: c.offers.title,
+        itemListElement: c.offers.packs.map((pack) => {
+          const amount = priceOf(pack.price);
+          return {
+            '@type': 'Offer',
+            name: pack.name,
+            description: pack.tag,
+            category: c.offers.eyebrow,
+            ...(amount
+              ? {
+                  price: amount,
+                  priceCurrency: 'EUR',
+                  valueAddedTaxIncluded: true,
+                }
+              : {}),
+            availability: 'https://schema.org/InStock',
+            areaServed,
+            seller: { '@id': `${site.url}/#business` },
+            itemOffered: {
+              '@type': 'Service',
+              name: pack.name,
+              serviceType: c.seo.serviceType,
+              provider: { '@id': `${site.url}/#business` },
+              areaServed,
+            },
+          };
+        }),
+      },
+    },
+    {
+      '@type': 'WebSite',
+      '@id': `${site.url}/#website`,
+      url: site.url,
+      name: site.name,
+      publisher: { '@id': `${site.url}/#business` },
+      inLanguage: ['fr-FR', 'en'],
+    },
+    {
+      '@type': 'WebPage',
+      '@id': `${canonical}#webpage`,
+      url: canonical,
+      name: title,
+      description,
+      inLanguage: cur === 'en' ? 'en' : 'fr-FR',
+      isPartOf: { '@id': `${site.url}/#website` },
+      about: { '@id': `${site.url}/#business` },
+      primaryImageOfPage: ogUrl,
+    },
   ],
-  sameAs: site.socials.map((s) => s.href),
 };
 ---
 
 <!doctype html>
-<html lang="fr" data-loading={preload ? '' : undefined}>
+<html lang={c.htmlLang} data-loading={preload ? '' : undefined}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <!-- Favicons : le monogramme du logo (T templier), ivoire sur vert de course.
+         Le dessin complet du logo (silhouette + T) devient illisible à 16 px —
+         seul le monogramme tient à cette taille. -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
     <link rel="canonical" href={canonical} />
-    <meta name="theme-color" content="#ffffff" />
+    <meta name="theme-color" content="#00352f" />
 
     <title>{title}</title>
     <meta name="description" content={description} />
+    <meta name="keywords" content={c.seo.keywords} />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+    <meta name="author" content={site.name} />
+
+    <!-- Alternates FR / EN (hreflang) -->
+    <link rel="alternate" hreflang="fr-FR" href={altUrls.fr} />
+    <link rel="alternate" hreflang="en" href={altUrls.en} />
+    <link rel="alternate" hreflang="x-default" href={altUrls.fr} />
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
@@ -67,37 +169,54 @@ const jsonLd = {
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={ogUrl} />
+    <meta property="og:image:type" content="image/jpeg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content={seo.ogAlt} />
-    <meta property="og:locale" content="fr_FR" />
+    <meta property="og:image:alt" content={c.seo.ogAlt} />
+    <meta property="og:locale" content={c.ogLocale} />
+    <meta property="og:locale:alternate" content={altOgLocale} />
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogUrl} />
+    <meta name="twitter:image:alt" content={c.seo.ogAlt} />
 
     <link rel="sitemap" href="/sitemap-index.xml" />
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 
+    <!-- Détection de langue : à la 1ʳᵉ visite, un navigateur non francophone est
+         redirigé vers /en/ (choix mémorisé et respecté ensuite). Ne bloque pas
+         l'indexation : chaque langue a son URL propre + hreflang. -->
+    <script is:inline>
+      (function () {
+        try {
+          var p = location.pathname;
+          var onEn = /^\/en(\/|$)/.test(p);
+          var saved = localStorage.getItem('tas-lang');
+          if (!saved && !onEn) {
+            var l = (navigator.language || navigator.userLanguage || '').toLowerCase();
+            if (l && l.indexOf('fr') !== 0) {
+              localStorage.setItem('tas-lang', 'en');
+              location.replace((p === '/' ? '/en/' : '/en' + p) + location.search + location.hash);
+            }
+          }
+        } catch (e) {}
+      })();
+    </script>
+
     <noscript>
       <style>
-        [data-preloader],
-        .cursor-dot,
-        .cursor-ring { display: none !important; }
+        [data-preloader] { display: none !important; }
         html { overflow: auto !important; }
       </style>
     </noscript>
   </head>
   <body>
-    <a href="#main" class="skip-link">Aller au contenu principal</a>
+    <a href="#main" class="skip-link">{c.ui.skipLink}</a>
 
     {preload && <Preloader />}
-
-    <!-- Custom cursor -->
-    <div class="cursor-ring" aria-hidden="true"></div>
-    <div class="cursor-dot" aria-hidden="true"></div>
 
     <!-- Global grain -->
     <div class="grain" aria-hidden="true"></div>
@@ -113,6 +232,18 @@ const jsonLd = {
 
     <script>
       import '../lib/motion.ts';
+    </script>
+
+    <!-- Mémorise la langue choisie via le sélecteur (respecte le choix ensuite). -->
+    <script is:inline>
+      document.addEventListener('click', function (e) {
+        var a = e.target.closest && e.target.closest('a[hreflang]');
+        if (a) {
+          try {
+            localStorage.setItem('tas-lang', a.getAttribute('hreflang'));
+          } catch (err) {}
+        }
+      });
     </script>
   </body>
 </html>

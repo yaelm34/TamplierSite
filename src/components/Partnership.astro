@@ -1,7 +1,8 @@
 ---
 import { Image } from 'astro:assets';
-import { partnership } from '../data/content';
+import { getContent } from '../data/content';
 import porsche from '../assets/images/porsche.png';
+const { partnership } = getContent(Astro.currentLocale);
 ---
 
 <section class="on-dark relative overflow-hidden bg-racing-deep py-24 text-ivory sm:py-32 lg:py-40" data-parallax-scope>
@@ -46,7 +47,7 @@ import porsche from '../assets/images/porsche.png';
         <div data-parallax="0.06" class="absolute inset-[4%]">
           <Image
             src={porsche}
-            alt="Véhicule premium protégé par film PPF, illustration aquarelle"
+            alt={partnership.artAlt}
             widths={[600, 900, 1400]}
             sizes="(max-width: 1024px) 100vw, 50vw"
             class="h-full w-full object-contain"

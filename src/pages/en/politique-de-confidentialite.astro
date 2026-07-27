@@ -1,0 +1,70 @@
+---
+import LegalLayout from '../../components/LegalLayout.astro';
+import { site } from '../../data/content';
+---
+<LegalLayout
+  eyebrow="Your data"
+  title="Privacy policy"
+  metaTitle={`Privacy policy — ${site.name}`}
+  description="Privacy policy and personal data processing (GDPR) of TAMPLIER AUTO SOURCING."
+>
+  <p>
+    {site.name} places particular importance on protecting your personal data and undertakes to
+    process it in compliance with the General Data Protection Regulation (GDPR) and the French
+    Data Protection Act.
+  </p>
+
+  <h2>Data controller</h2>
+  <p>
+    The data controller is {site.name}, represented by {site.founder}. For any question relating
+    to your data, contact <a href={`mailto:${site.email}`}>{site.email}</a>.
+  </p>
+
+  <h2>Data collected</h2>
+  <p>
+    Through the contact form, we only collect the data you provide voluntarily:
+  </p>
+  <ul>
+    <li>Name</li>
+    <li>Email address</li>
+    <li>Phone number (optional)</li>
+    <li>Preferred package, budget and vehicle wanted (optional)</li>
+    <li>The content of your message</li>
+  </ul>
+
+  <h2>Purpose and legal basis</h2>
+  <p>
+    This data is used exclusively to respond to your request, prepare a quote and follow up on
+    your car project. The legal basis for processing is your consent as well as the performance
+    of pre-contractual measures taken at your request.
+  </p>
+
+  <h2>Retention period</h2>
+  <p>
+    Your data is kept for as long as necessary to process your request, then archived for a
+    maximum of three years from the last contact, unless a legal obligation requires otherwise.
+  </p>
+
+  <h2>Recipients</h2>
+  <p>
+    Your data is neither sold nor transferred to third parties. It is processed by {site.founder}
+    and, where applicable, by the technical provider handling the delivery of the form, strictly
+    within the limits necessary for the service.
+  </p>
+
+  <h2>Your rights</h2>
+  <p>
+    In accordance with the GDPR, you have the right to access, rectify, erase, restrict, object
+    to and port your data. You may exercise these rights by writing to
+    <a href={`mailto:${site.email}`}>{site.email}</a>. You also have the right to lodge a
+    complaint with the French data protection authority, the CNIL
+    (<a href="https://www.cnil.fr" target="_blank" rel="noopener noreferrer">www.cnil.fr</a>).
+  </p>
+
+  <h2>Cookies</h2>
+  <p>
+    This site is static and does not use advertising tracking cookies or third-party trackers.
+    Only data strictly necessary for the proper functioning of the site may be used, without
+    requiring consent.
+  </p>
+</LegalLayout>

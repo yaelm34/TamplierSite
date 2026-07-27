@@ -1,0 +1,62 @@
+---
+import LegalLayout from '../../components/LegalLayout.astro';
+import { site, legal } from '../../data/content';
+---
+<LegalLayout
+  eyebrow="Legal information"
+  title="Legal notice"
+  metaTitle={`Legal notice — ${site.name}`}
+  description="Legal notice for TAMPLIER AUTO SOURCING SASU — publisher, hosting and company information."
+>
+  <h2>Site publisher</h2>
+  <p>
+    This website is published by <strong>{site.name}</strong>, a French SASU (simplified
+    joint-stock company) with a share capital of {legal.capital}.
+  </p>
+  <ul>
+    <li>Registered office: {site.address.street}, {site.address.postalCode} {site.address.locality}</li>
+    <li>{legal.rcs}</li>
+    <li>SIRET: {legal.siret}</li>
+    <li>Intra-community VAT no.: {legal.tva}</li>
+    <li>APE code: {legal.ape}</li>
+    <li>Publication director: {site.founder}, Founder & Director</li>
+    <li>Phone: <a href={`tel:${site.phoneIntl}`}>{site.phone}</a></li>
+    <li>Email: <a href={`mailto:${site.email}`}>{site.email}</a></li>
+  </ul>
+
+  <h2>Hosting</h2>
+  <p>
+    This site is hosted on a high-availability static infrastructure (e.g. Vercel Inc. or
+    Netlify, Inc.). The host's full contact details are available on request at
+    <a href={`mailto:${site.email}`}>{site.email}</a>.
+  </p>
+
+  <h2>Intellectual property</h2>
+  <p>
+    All content on this site (texts, illustrations, visual identity, logo) is the exclusive
+    property of {site.name}, unless stated otherwise. Any reproduction, representation,
+    modification or exploitation, in whole or in part, without prior written authorisation is
+    prohibited and would constitute an infringement.
+  </p>
+
+  <h2>Activity</h2>
+  <p>
+    {site.name} operates as a car buying agent: search, inspection, negotiation and secure
+    purchase of premium, sports and exceptional vehicles on behalf of its clients, across France
+    and Europe. Funds intended to purchase the vehicle never pass through the company; they are
+    paid directly to the seller.
+  </p>
+
+  <h2>Liability</h2>
+  <p>
+    {site.name} strives to ensure the accuracy of the information published on this site but
+    cannot be held liable for errors, omissions or any temporary unavailability of the service.
+    The prices shown are subject to change and are confirmed within the search mandate.
+  </p>
+
+  <h2>Governing law</h2>
+  <p>
+    This legal notice is governed by French law. Any dispute relating to the use of the site
+    falls under the jurisdiction of the courts of Montpellier, France.
+  </p>
+</LegalLayout>

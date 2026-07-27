@@ -1,8 +1,16 @@
 ---
 import { Image } from 'astro:assets';
 import Button from './Button.astro';
-import { nav, cta, site } from '../data/content';
-import wordmark from '../assets/images/logo-wordmark.jpg';
+import { getContent, site } from '../data/content';
+import wordmark from '../assets/images/logo-full.png';
+
+const { nav, cta, ui } = getContent(Astro.currentLocale);
+const cur = Astro.currentLocale === 'en' ? 'en' : 'fr';
+// URL de la même page dans l'autre langue (FR ⇄ EN).
+const path = Astro.url.pathname;
+const altHref =
+  cur === 'en' ? path.replace(/^\/en(\/|$)/, '/') : path === '/' ? '/en/' : `/en${path}`;
+const altLang = cur === 'en' ? 'fr' : 'en';
 ---
 
 <header
@@ -15,18 +23,18 @@ import wordmark from '../assets/images/logo-wordmark.jpg';
          border-b border-transparent data-[scrolled=true]:border-racing/10"
 >
   <div class="mx-auto flex h-[var(--header-h)] w-full max-w-[1440px] items-center justify-between px-6 sm:px-10 lg:px-14">
-    <a href="#top" class="block shrink-0 transition-opacity hover:opacity-70" aria-label={`${site.name} — accueil`}>
+    <a href="#top" class="block shrink-0 transition-opacity hover:opacity-70" aria-label={`${site.name} — ${ui.homeAria}`}>
       <Image
         src={wordmark}
         alt={site.name}
-        widths={[160, 260, 360]}
-        sizes="150px"
+        widths={[120, 200, 300]}
+        sizes="140px"
         loading="eager"
-        class="h-8 w-auto sm:h-9"
+        class="h-12 w-auto sm:h-14"
       />
     </a>
 
-    <nav class="hidden items-center gap-9 lg:flex" aria-label="Navigation principale">
+    <nav class="hidden items-center gap-9 lg:flex" aria-label={ui.navMain}>
       {
         nav.map((item) => (
           <a
@@ -40,22 +48,52 @@ import wordmark from '../assets/images/logo-wordmark.jpg';
       }
     </nav>
 
-    <div class="hidden lg:block">
+    <div class="hidden items-center gap-5 lg:flex">
+      <a
+        href={altHref}
+        hreflang={altLang}
+        aria-label={ui.langLabel}
+        class="group flex items-center gap-1.5 text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-racing/65 transition-colors duration-300 hover:text-racing"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" class="h-[1.05rem] w-[1.05rem]" aria-hidden="true">
+          <circle cx="12" cy="12" r="9" />
+          <path d="M3 12h18" />
+          <path d="M12 3c2.6 2.7 2.6 15.3 0 18M12 3c-2.6 2.7-2.6 15.3 0 18" />
+        </svg>
+        <span>{ui.langCode}</span>
+      </a>
       <Button href={cta.primary.href} variant="solid" class="!px-6 !py-3">{cta.primary.label}</Button>
     </div>
 
-    <!-- Mobile toggle -->
-    <button
-      type="button"
-      class="relative z-50 flex h-11 w-11 items-center justify-center lg:hidden"
-      aria-label="Ouvrir le menu"
-      data-menu-toggle
-    >
-      <span class="menu-bars relative block h-3 w-6">
-        <span class="menu-bar absolute left-0 top-0 h-px w-full bg-racing transition-all duration-400 ease-[var(--ease-lux)]"></span>
-        <span class="menu-bar absolute bottom-0 left-0 h-px w-full bg-racing transition-all duration-400 ease-[var(--ease-lux)]"></span>
-      </span>
-    </button>
+    <!-- Mobile: language switch + toggle -->
+    <div class="flex items-center gap-1 lg:hidden">
+      <a
+        href={altHref}
+        hreflang={altLang}
+        aria-label={ui.langLabel}
+        class="flex h-11 items-center gap-1.5 px-2 text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-racing/70"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" class="h-[1.05rem] w-[1.05rem]" aria-hidden="true">
+          <circle cx="12" cy="12" r="9" />
+          <path d="M3 12h18" />
+          <path d="M12 3c2.6 2.7 2.6 15.3 0 18M12 3c-2.6 2.7-2.6 15.3 0 18" />
+        </svg>
+        <span>{ui.langCode}</span>
+      </a>
+      <button
+        type="button"
+        class="relative z-50 flex h-11 w-11 items-center justify-center"
+        aria-label={ui.menuOpen}
+        data-menu-toggle
+        data-label-open={ui.menuOpen}
+        data-label-close={ui.menuClose}
+      >
+        <span class="menu-bars relative block h-3 w-6">
+          <span class="menu-bar absolute left-0 top-0 h-px w-full bg-racing transition-all duration-400 ease-[var(--ease-lux)]"></span>
+          <span class="menu-bar absolute bottom-0 left-0 h-px w-full bg-racing transition-all duration-400 ease-[var(--ease-lux)]"></span>
+        </span>
+      </button>
+    </div>
   </div>
 </header>
 
@@ -66,7 +104,7 @@ import wordmark from '../assets/images/logo-wordmark.jpg';
   aria-hidden="true"
 >
   <span class="glow-follow" aria-hidden="true"></span>
-  <nav class="relative flex flex-col gap-2" aria-label="Navigation mobile">
+  <nav class="relative flex flex-col gap-2" aria-label={ui.navMobile}>
     {
       nav.map((item) => (
         <a
@@ -78,8 +116,21 @@ import wordmark from '../assets/images/logo-wordmark.jpg';
       ))
     }
   </nav>
-  <div class="relative mt-12">
+  <div class="relative mt-12 flex items-center justify-between gap-5">
     <Button href={cta.primary.href} variant="solid" magnetic={false}>{cta.primary.label}</Button>
+    <a
+      href={altHref}
+      hreflang={altLang}
+      aria-label={ui.langLabel}
+      class="flex shrink-0 items-center gap-2 text-[0.78rem] font-semibold uppercase tracking-[0.16em] text-ivory/75 transition-colors hover:text-gold"
+    >
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" class="h-5 w-5" aria-hidden="true">
+        <circle cx="12" cy="12" r="9" />
+        <path d="M3 12h18" />
+        <path d="M12 3c2.6 2.7 2.6 15.3 0 18M12 3c-2.6 2.7-2.6 15.3 0 18" />
+      </svg>
+      <span>{ui.langCode}</span>
+    </a>
   </div>
 </div>
 
@@ -109,10 +160,12 @@ import wordmark from '../assets/images/logo-wordmark.jpg';
 <script>
   const toggle = document.querySelector('[data-menu-toggle]');
   const root = document.documentElement;
+  const labelOpen = toggle?.getAttribute('data-label-open') || 'Open menu';
+  const labelClose = toggle?.getAttribute('data-label-close') || 'Close menu';
   toggle?.addEventListener('click', () => {
     const open = root.hasAttribute('data-menu-open');
     if (open) root.removeAttribute('data-menu-open');
     else root.setAttribute('data-menu-open', '');
-    toggle.setAttribute('aria-label', open ? 'Ouvrir le menu' : 'Fermer le menu');
+    toggle.setAttribute('aria-label', open ? labelOpen : labelClose);
   });
 </script>

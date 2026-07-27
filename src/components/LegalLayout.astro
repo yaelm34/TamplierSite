@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import SplitText from './SplitText.astro';
+import { getContent } from '../data/content';
 interface Props {
   title: string;
   eyebrow: string;
@@ -8,6 +9,8 @@ interface Props {
   description: string;
 }
 const { title, eyebrow, metaTitle, description } = Astro.props;
+const { legalPages } = getContent(Astro.currentLocale);
+const home = Astro.currentLocale === 'en' ? '/en/' : '/';
 ---
 <Base title={metaTitle} description={description} preload={false}>
   <article class="relative overflow-hidden bg-paper pt-[calc(var(--header-h)+5rem)] pb-32 text-racing">
@@ -21,8 +24,8 @@ const { title, eyebrow, metaTitle, description } = Astro.props;
       <div class="legal-prose prose-lux">
         <slot />
       </div>
-      <a href="/" class="mt-16 inline-flex items-center gap-3 text-[0.72rem] uppercase tracking-[0.22em] text-gold-dark transition-colors hover:text-racing">
-        <span>←</span> Retour à l'accueil
+      <a href={home} class="mt-16 inline-flex items-center gap-3 text-[0.72rem] uppercase tracking-[0.22em] text-gold-dark transition-colors hover:text-racing">
+        <span>←</span> {legalPages.back}
       </a>
     </div>
   </article>

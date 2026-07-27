@@ -1,9 +1,14 @@
 ---
 import { Image } from 'astro:assets';
-import { steps } from '../data/content';
+import { getContent } from '../data/content';
+const { steps, ui } = getContent(Astro.currentLocale);
 
+// Toutes les images du dossier, indexées par nom de fichier : `steps.items[].image`
+// n'a plus à respecter un préfixe. Le glob ne faisait que `detail-*`, si bien
+// qu'une illustration nommée autrement restait introuvable et l'étape s'affichait
+// sans visuel. Aucun coût de build : Astro n'optimise que ce qui passe par <Image>.
 const imgGlob = import.meta.glob<{ default: ImageMetadata }>(
-  '../assets/images/detail-*.{jpg,png}',
+  '../assets/images/*.{jpg,png}',
   { eager: true }
 );
 const images: Record<string, ImageMetadata> = {};
@@ -28,7 +33,7 @@ for (const path in imgGlob) {
       </div>
       <h2 class="headline max-w-[12ch]" data-reveal="rise" data-delay="0.05">{steps.title}</h2>
       <span class="mt-10 hidden items-center gap-3 text-gold/70 lg:flex" data-reveal="rise" data-delay="0.15" aria-hidden="true">
-        <span class="eyebrow text-[0.55rem]">Défiler</span>
+        <span class="eyebrow text-[0.55rem]">{ui.scroll}</span>
         <span class="h-px w-16 bg-gold/40"></span>
         <span>→</span>
       </span>
@@ -37,7 +42,7 @@ for (const path in imgGlob) {
     <!-- Step panels -->
     {
       steps.items.map((step) => (
-        <article class="relative flex w-full shrink-0 flex-col justify-center gap-7 border-t border-ivory/10 px-6 py-20 sm:px-10 lg:h-full lg:w-[40vw] lg:border-l lg:border-t-0 lg:px-14 lg:py-0">
+        <article class="relative flex w-full shrink-0 flex-col justify-center gap-7 border-t border-ivory/10 px-6 py-20 sm:px-10 lg:h-full lg:w-[40vw] lg:justify-start lg:border-l lg:border-t-0 lg:px-14 lg:pb-[6vh] lg:pt-[13vh]">
           <span class="numeral-outline block text-[5rem] leading-none sm:text-[7rem]">{step.n}</span>
 
           <!-- plate — image breathes inside its frame -->

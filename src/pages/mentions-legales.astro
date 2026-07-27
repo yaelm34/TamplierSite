@@ -1,6 +1,7 @@
 ---
 import LegalLayout from '../components/LegalLayout.astro';
-import { site, legal } from '../data/content';
+import { site, legal, getContent } from '../data/content';
+const { ui } = getContent(Astro.currentLocale);
 ---
 <LegalLayout
   eyebrow="Informations légales"
@@ -18,7 +19,7 @@ import { site, legal } from '../data/content';
     <li>SIRET : {legal.siret}</li>
     <li>N° de TVA intracommunautaire : {legal.tva}</li>
     <li>Code APE : {legal.ape}</li>
-    <li>Directeur de la publication : {site.founder}, {site.founderRole}</li>
+    <li>Directeur de la publication : {site.founder}, {ui.founderRole}</li>
     <li>Téléphone : <a href={`tel:${site.phoneIntl}`}>{site.phone}</a></li>
     <li>E-mail : <a href={`mailto:${site.email}`}>{site.email}</a></li>
   </ul>

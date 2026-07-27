@@ -1,5 +1,6 @@
 ---
-import { manifesto } from '../data/content';
+import { getContent } from '../data/content';
+const { manifesto } = getContent(Astro.currentLocale);
 
 // split into words, tagging the gold key words (punctuation-insensitive)
 const isGold = (w: string) =>
@@ -23,7 +24,7 @@ const words = manifesto.text.split(' ');
 
     <div class="mt-12 flex items-center gap-4" data-reveal="rise">
       <span class="h-px w-10 bg-gold/50"></span>
-      <span class="eyebrow">Anthony Tamplier — Fondateur</span>
+      <span class="eyebrow">{manifesto.author}</span>
     </div>
   </div>
 </section>
