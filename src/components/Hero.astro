@@ -44,14 +44,23 @@ const words = (s: string) => s.split(' ');
       </div>
 
       <h1 class="display max-w-[13ch] text-racing" data-word-reveal>
+        {/* L'espace inter-mots vit HORS du masque : à l'intérieur, une espace
+            finale « pend » en bout de ligne et ne compte pas dans la largeur,
+            ce qui recolle les mots (L'artdusourcing). */}
         <span class="block">
           {words(hero.titleTop).map((w, i, arr) => (
-            <span class="w-mask"><span class="w-inner">{w}{i < arr.length - 1 ? ' ' : ''}</span></span>
+            <>
+              <span class="w-mask"><span class="w-inner">{w}</span></span>
+              {i < arr.length - 1 ? ' ' : ''}
+            </>
           ))}
         </span>
         <span class="block">
           {words(hero.titleAccent).map((w, i, arr) => (
-            <span class="w-mask"><span class="w-inner italic-display text-gold-dark">{w}{i < arr.length - 1 ? ' ' : ''}</span></span>
+            <>
+              <span class="w-mask"><span class="w-inner italic-display text-gold-dark">{w}</span></span>
+              {i < arr.length - 1 ? ' ' : ''}
+            </>
           ))}
         </span>
       </h1>

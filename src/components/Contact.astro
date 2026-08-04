@@ -4,6 +4,8 @@ import Button from './Button.astro';
 import { getContent, site } from '../data/content';
 const { contact, ui } = getContent(Astro.currentLocale);
 const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT ?? '';
+/* Clé publique du relais (Web3Forms). Formspree n'en a pas besoin : laisser vide. */
+const accessKey = import.meta.env.PUBLIC_FORM_ACCESS_KEY ?? '';
 ---
 
 <section id="contact" class="relative overflow-hidden bg-paper-2 py-24 text-racing sm:py-32 lg:py-40" data-parallax-scope>
@@ -61,6 +63,7 @@ const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT ?? '';
       <form
         data-contact-form
         data-endpoint={endpoint}
+        data-access-key={accessKey}
         data-mailto={site.email}
         class="grid gap-x-8 gap-y-2 sm:grid-cols-2"
         novalidate
@@ -161,10 +164,18 @@ const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT ?? '';
       if (endpoint) {
         try {
           setStatus(sendingText, true);
+          const accessKey = form.dataset.accessKey;
+          const payload = {
+            ...data,
+            // Répondre depuis la boîte mail renvoie directement au client.
+            replyto: data.email,
+            subject: `${mailSubject} — ${data.name} — ${data.pack || mailToDefine}`,
+            ...(accessKey ? { access_key: accessKey } : {}),
+          };
           const res = await fetch(endpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-            body: JSON.stringify(data),
+            body: JSON.stringify(payload),
           });
           if (!res.ok) throw new Error('bad status');
           form.reset();
