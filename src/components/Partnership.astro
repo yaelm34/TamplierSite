@@ -1,7 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import { getContent } from '../data/content';
-import porsche from '../assets/images/porsche.png';
+import valhalla from '../assets/images/valhalla.png';
 const { partnership } = getContent(Astro.currentLocale);
 ---
 
@@ -46,7 +46,7 @@ const { partnership } = getContent(Astro.currentLocale);
       <div data-img-reveal class="relative aspect-[16/10] w-full overflow-hidden border border-gold/25 bg-paper">
         <div data-parallax="0.06" class="absolute inset-[4%]">
           <Image
-            src={porsche}
+            src={valhalla}
             alt={partnership.artAlt}
             widths={[600, 900, 1400]}
             sizes="(max-width: 1024px) 100vw, 50vw"

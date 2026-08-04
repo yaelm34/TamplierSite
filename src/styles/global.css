@@ -1,15 +1,22 @@
 @import 'tailwindcss';
 
-/* Self-hosted fonts — Fraunces (editorial display) + Inter (grotesque body) */
-@import '@fontsource/fraunces/300.css';
-@import '@fontsource/fraunces/400.css';
-@import '@fontsource/fraunces/500.css';
-@import '@fontsource/fraunces/300-italic.css';
-@import '@fontsource/fraunces/400-italic.css';
-@import '@fontsource/inter/300.css';
-@import '@fontsource/inter/400.css';
-@import '@fontsource/inter/500.css';
-@import '@fontsource/inter/600.css';
+/* Self-hosted fonts — Fraunces (editorial display) + Inter (grotesque body)
+   Imports restreints au LATIN. Les imports génériques (`400.css`) embarquent
+   tous les alphabets : cyrillique, grec et vietnamien pesaient 236 Ko de fichiers
+   livrés pour un site franco-anglais qui ne les affichera jamais.
+   `latin-ext` est conservé : il porte les caractères d'Europe centrale que du
+   contenu automobile peut croiser (Škoda, Porsche Panamera Turbo S…). */
+@import '@fontsource/fraunces/latin-300.css';
+@import '@fontsource/fraunces/latin-400.css';
+@import '@fontsource/fraunces/latin-500.css';
+@import '@fontsource/fraunces/latin-300-italic.css';
+@import '@fontsource/fraunces/latin-400-italic.css';
+@import '@fontsource/fraunces/latin-ext-400.css';
+@import '@fontsource/inter/latin-300.css';
+@import '@fontsource/inter/latin-400.css';
+@import '@fontsource/inter/latin-500.css';
+@import '@fontsource/inter/latin-600.css';
+@import '@fontsource/inter/latin-ext-400.css';
 
 /* ============================================================
    DESIGN TOKENS  —  TAMPLIER AUTO SOURCING  (light / paper)

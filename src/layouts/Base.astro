@@ -5,6 +5,15 @@ import Footer from '../components/Footer.astro';
 import Preloader from '../components/Preloader.astro';
 import { site, legal, getContent } from '../data/content';
 
+// Polices critiques importées pour obtenir leur URL finale (hachée) et les
+// PRÉCHARGER. Sans ça le navigateur ne les découvre qu'après avoir analysé le
+// CSS : le texte s'affiche d'abord dans une police de repli, puis saute. Seules
+// les trois réellement visibles au premier écran sont préchargées — en précharger
+// davantage entrerait en concurrence avec l'image principale.
+import fraunces400 from '@fontsource/fraunces/files/fraunces-latin-400-normal.woff2';
+import fraunces300 from '@fontsource/fraunces/files/fraunces-latin-300-normal.woff2';
+import inter400 from '@fontsource/inter/files/inter-latin-400-normal.woff2';
+
 interface Props {
   title?: string;
   description?: string;
@@ -151,6 +160,14 @@ const jsonLd = {
     <link rel="canonical" href={canonical} />
     <meta name="theme-color" content="#00352f" />
 
+    <!-- Polices du premier écran, chargées en parallèle du CSS et non après lui.
+         `crossorigin` est OBLIGATOIRE même en même origine : une police est
+         toujours récupérée en mode anonyme, et sans cet attribut le navigateur
+         télécharge le fichier DEUX fois. -->
+    <link rel="preload" href={fraunces400} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={fraunces300} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={inter400} as="font" type="font/woff2" crossorigin />
+
     <title>{title}</title>
     <meta name="description" content={description} />
     <meta name="keywords" content={c.seo.keywords} />
@@ -187,11 +204,25 @@ const jsonLd = {
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 
     <!-- Détection de langue : à la 1ʳᵉ visite, un navigateur non francophone est
-         redirigé vers /en/ (choix mémorisé et respecté ensuite). Ne bloque pas
-         l'indexation : chaque langue a son URL propre + hreflang. -->
+         redirigé vers /en/ (choix mémorisé et respecté ensuite).
+         ⚠️ Les ROBOTS sont exclus, et ce n'est pas un détail. Googlebot explore
+         depuis les États-Unis avec un `navigator.language` en `en-US` : sans ce
+         garde-fou, il était redirigé de `/` vers `/en/` à chaque passage. La page
+         d'accueil FRANÇAISE — celle qui vise le marché de l'entreprise — n'était
+         donc jamais explorée telle quelle, et Google pouvait la traiter comme un
+         simple doublon de la version anglaise.
+         Google déconseille d'ailleurs la redirection automatique par langue,
+         justement parce qu'elle empêche l'exploration des autres versions. Le
+         hreflang au-dessus suffit à lui indiquer la bonne version. -->
     <script is:inline>
       (function () {
         try {
+          var ua = navigator.userAgent || '';
+          // Filtre volontairement large : mieux vaut ne pas rediriger un humain
+          // rare que d'empêcher un moteur d'indexer une version du site.
+          if (/bot|crawl|spider|slurp|bing|duckduck|baidu|yandex|facebookexternalhit|embed|preview|lighthouse|headless/i.test(ua)) return;
+          if (navigator.webdriver) return;
+
           var p = location.pathname;
           var onEn = /^\/en(\/|$)/.test(p);
           var saved = localStorage.getItem('tas-lang');
