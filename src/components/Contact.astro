@@ -1,7 +1,9 @@
 ---
+import { Image } from 'astro:assets';
 import SplitText from './SplitText.astro';
 import Button from './Button.astro';
 import { getContent, site } from '../data/content';
+import astonCar from '../assets/images/aston.png';
 const { contact, ui } = getContent(Astro.currentLocale);
 const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT ?? '';
 /* Clé publique du relais (Web3Forms). Formspree n'en a pas besoin : laisser vide. */
@@ -59,7 +61,7 @@ const accessKey = import.meta.env.PUBLIC_FORM_ACCESS_KEY ?? '';
     </div>
 
     <!-- Form -->
-    <div data-reveal="rise" data-delay="0.15">
+    <div class="relative" data-reveal="rise" data-delay="0.15">
       <form
         data-contact-form
         data-endpoint={endpoint}
@@ -68,48 +70,86 @@ const accessKey = import.meta.env.PUBLIC_FORM_ACCESS_KEY ?? '';
         class="grid gap-x-8 gap-y-2 sm:grid-cols-2"
         novalidate
       >
-        <div class="field">
-          <input id="name" name="name" type="text" placeholder=" " required autocomplete="name" />
-          <label for="name">{ui.fieldName}</label>
+        <div class="field sm:col-span-2">
+          <input id="name" name="name" type="text" placeholder=" " required autocomplete="name" aria-describedby="err-name" />
+          <label for="name">{ui.fieldName} <span class="req" aria-hidden="true">*</span></label>
+          <p class="field-error" id="err-name" data-error-for="name"></p>
         </div>
         <div class="field">
-          <input id="email" name="email" type="email" placeholder=" " required autocomplete="email" />
-          <label for="email">{ui.fieldEmail}</label>
+          <input id="email" name="email" type="email" placeholder=" " autocomplete="email" aria-describedby="err-email" />
+          <label for="email">{ui.fieldEmail} <span class="req" aria-hidden="true">*</span></label>
+          <p class="field-error" id="err-email" data-error-for="email"></p>
         </div>
         <div class="field">
-          <input id="phone" name="phone" type="tel" placeholder=" " autocomplete="tel" />
-          <label for="phone">{ui.fieldPhone}</label>
+          <input id="phone" name="phone" type="tel" placeholder=" " autocomplete="tel" aria-describedby="err-phone" />
+          <label for="phone">{ui.fieldPhone} <span class="req" aria-hidden="true">*</span></label>
+          <p class="field-error" id="err-phone" data-error-for="phone"></p>
         </div>
+        <p class="muted-soft -mt-1 mb-3 text-xs sm:col-span-2">{ui.formContactNote}</p>
+
         <div class="field">
-          <select id="pack" name="pack" required>
+          <select id="pack" name="pack">
             <option value="" selected hidden></option>
             {contact.packOptions.map((o) => <option value={o}>{o}</option>)}
           </select>
-          <label for="pack">{ui.fieldPack}</label>
+          <label for="pack">{ui.fieldPack} <span class="opt">({ui.fieldOptional})</span></label>
         </div>
         <div class="field">
           <input id="budget" name="budget" type="text" placeholder=" " inputmode="numeric" />
-          <label for="budget">{ui.fieldBudget}</label>
-        </div>
-        <div class="field">
-          <input id="vehicle" name="vehicle" type="text" placeholder=" " />
-          <label for="vehicle">{ui.fieldVehicle}</label>
+          <label for="budget">{ui.fieldBudget} <span class="opt">({ui.fieldOptional})</span></label>
         </div>
         <div class="field sm:col-span-2">
-          <textarea id="message" name="message" placeholder=" " rows="4"></textarea>
-          <label for="message">{ui.fieldMessage}</label>
+          <input id="vehicle" name="vehicle" type="text" placeholder=" " />
+          <label for="vehicle">{ui.fieldVehicle} <span class="opt">({ui.fieldOptional})</span></label>
+        </div>
+        <div class="field sm:col-span-2">
+          {/* Le placeholder n'apparaît qu'au focus : sinon il masquerait le label flottant. */}
+          <textarea id="message" name="message" placeholder={ui.messagePlaceholder} rows="4" data-placeholder-on-focus
+          ></textarea>
+          <label for="message">{ui.fieldMessage} <span class="opt">({ui.fieldOptional})</span></label>
         </div>
 
         <!-- honeypot -->
         <input type="text" name="company" tabindex="-1" autocomplete="off" class="hidden" aria-hidden="true" />
 
-        <div class="mt-6 flex flex-col gap-4 sm:col-span-2 sm:flex-row sm:items-center sm:justify-between">
+        <p class="muted-soft mt-4 text-xs sm:col-span-2">{ui.formRequiredNote}</p>
+
+        <div class="mt-3 flex flex-col gap-4 sm:col-span-2 sm:flex-row sm:items-center sm:justify-between">
           <p class="muted-soft max-w-[34ch] text-xs" data-form-status role="status" aria-live="polite">
             {ui.formReply}
           </p>
           <Button type="submit" variant="solid" magnetic={false}>{ui.formSubmit}</Button>
         </div>
       </form>
+
+      <!-- Panneau de confirmation : remplace le formulaire après envoi -->
+      <div data-form-success class="form-success" hidden>
+        <div class="form-success-inner">
+          <span class="eyebrow">{contact.fields.successEyebrow}</span>
+          <h3 class="display mt-4 text-4xl sm:text-5xl">
+            {contact.fields.successTitle}
+          </h3>
+          <p class="italic-display mt-2 text-2xl text-gold-dark sm:text-3xl">
+            {contact.fields.successLead}
+          </p>
+          <div class="mx-auto my-7 h-px w-24 bg-gold-dark/50"></div>
+          <p class="muted mx-auto max-w-[46ch] text-sm leading-relaxed">
+            {contact.fields.successDetail}
+          </p>
+          <Image
+            src={astonCar}
+            alt=""
+            aria-hidden="true"
+            widths={[420, 700, 900]}
+            sizes="(min-width: 640px) 460px, 88vw"
+            format="webp"
+            class="mx-auto mt-8 h-auto w-[88%] max-w-[460px] drop-shadow-[0_18px_28px_rgba(0,53,47,0.13)]"
+          />
+          <button type="button" class="form-success-again" data-form-reset>
+            {contact.fields.successAgain}
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -123,6 +163,10 @@ const accessKey = import.meta.env.PUBLIC_FORM_ACCESS_KEY ?? '';
     mailSubject: ui.mailSubject,
     mailOpening: ui.mailOpening,
     mailToDefine: ui.mailToDefine,
+    replyText: ui.formReply,
+    errRequired: ui.errorRequired,
+    errEmailFormat: ui.errorEmailFormat,
+    errContactNeeded: ui.errorContactNeeded,
     L: {
       name: ui.fieldName,
       email: ui.fieldEmail,
@@ -136,6 +180,7 @@ const accessKey = import.meta.env.PUBLIC_FORM_ACCESS_KEY ?? '';
   const form = document.querySelector('[data-contact-form]');
   if (form) {
     const status = form.querySelector('[data-form-status]');
+    const successPanel = document.querySelector('[data-form-success]');
     // float labels for selects
     form.querySelectorAll('select').forEach((sel) => {
       const sync = () => sel.setAttribute('data-filled', sel.value ? 'true' : 'false');
@@ -143,13 +188,87 @@ const accessKey = import.meta.env.PUBLIC_FORM_ACCESS_KEY ?? '';
       sync();
     });
 
+    /* ——— Validation : nom obligatoire, e-mail OU téléphone obligatoire ——— */
+    const fieldOf = (name) => form.querySelector(`[name="${name}"]`)?.closest('.field');
+    const setError = (name, msg) => {
+      const field = fieldOf(name);
+      if (!field) return;
+      field.setAttribute('data-invalid', msg ? 'true' : 'false');
+      const slot = field.querySelector('[data-error-for]');
+      if (slot) slot.textContent = msg || '';
+      const input = form.querySelector(`[name="${name}"]`);
+      if (input) input.setAttribute('aria-invalid', msg ? 'true' : 'false');
+    };
+    const clearErrors = () => ['name', 'email', 'phone'].forEach((n) => setError(n, ''));
+
+    // NB : form.elements — `form.name` renverrait l'attribut name du <form>.
+    const el = (n) => form.elements.namedItem(n);
+
+    const validate = () => {
+      clearErrors();
+      const nameEl = el('name');
+      const emailEl = el('email');
+      const phoneEl = el('phone');
+      const name = nameEl.value.trim();
+      const email = emailEl.value.trim();
+      const phone = phoneEl.value.trim();
+      let firstBad = null;
+
+      if (!name) {
+        setError('name', errRequired);
+        firstBad = firstBad || nameEl;
+      }
+      if (!email && !phone) {
+        setError('email', errContactNeeded);
+        setError('phone', ' ');
+        firstBad = firstBad || emailEl;
+      } else if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+        setError('email', errEmailFormat);
+        firstBad = firstBad || emailEl;
+      }
+      if (firstBad) firstBad.focus();
+      return !firstBad;
+    };
+
+    /* ——— Bascule formulaire ⇄ panneau de confirmation ——— */
+    const showSuccess = () => {
+      if (!successPanel) return;
+      form.hidden = true;
+      successPanel.hidden = false;
+      // Relance l'animation d'entrée à chaque affichage
+      const inner = successPanel.querySelector('.form-success-inner');
+      if (inner) {
+        inner.style.animation = 'none';
+        void inner.offsetWidth;
+        inner.style.animation = '';
+      }
+      successPanel.querySelector('[data-form-reset]')?.focus({ preventScroll: true });
+    };
+
+    successPanel?.querySelector('[data-form-reset]')?.addEventListener('click', () => {
+      successPanel.hidden = true;
+      form.hidden = false;
+      clearErrors();
+      if (status) {
+        status.textContent = replyText;
+        status.style.color = '';
+      }
+      el('name')?.focus({ preventScroll: true });
+    });
+
+    // Efface l'erreur d'un champ dès que l'utilisateur le corrige
+    ['name', 'email', 'phone'].forEach((n) => {
+      form.querySelector(`[name="${n}"]`)?.addEventListener('input', () => {
+        setError('name', '');
+        setError('email', '');
+        setError('phone', '');
+      });
+    });
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       if (form.company && form.company.value) return; // honeypot
-      if (!form.checkValidity()) {
-        form.reportValidity();
-        return;
-      }
+      if (!validate()) return;
       const data = Object.fromEntries(new FormData(form).entries());
       delete data.company;
       const endpoint = form.dataset.endpoint;
@@ -165,10 +284,14 @@ const accessKey = import.meta.env.PUBLIC_FORM_ACCESS_KEY ?? '';
         try {
           setStatus(sendingText, true);
           const accessKey = form.dataset.accessKey;
+          // Champs vides retirés : l'e-mail reçu ne liste que ce qui est renseigné.
+          const filled = Object.fromEntries(
+            Object.entries(data).filter(([, v]) => String(v).trim() !== '')
+          );
           const payload = {
-            ...data,
+            ...filled,
             // Répondre depuis la boîte mail renvoie directement au client.
-            replyto: data.email,
+            ...(filled.email ? { replyto: filled.email } : {}),
             subject: `${mailSubject} — ${data.name} — ${data.pack || mailToDefine}`,
             ...(accessKey ? { access_key: accessKey } : {}),
           };
@@ -181,6 +304,7 @@ const accessKey = import.meta.env.PUBLIC_FORM_ACCESS_KEY ?? '';
           form.reset();
           form.querySelectorAll('select').forEach((s) => s.setAttribute('data-filled', 'false'));
           setStatus(successText, true);
+          showSuccess();
         } catch {
           setStatus(errorText, false);
         }
