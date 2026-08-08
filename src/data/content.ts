@@ -274,7 +274,7 @@ const fr = {
     fields: {
       successTitle: 'Demande transmise',
       successText: 'Merci. Votre demande a bien été transmise — je reviens vers vous très vite.',
-      errorText: "L'envoi a échoué. Vous pouvez me joindre directement par téléphone ou e-mail.",
+      errorText: "L'envoi a échoué. Vous pouvez me joindre directement par e-mail.",
       successEyebrow: 'À très vite',
       successLead: 'Votre projet est entre de bonnes mains.',
       successDetail:
@@ -543,7 +543,7 @@ const en: typeof fr = {
     fields: {
       successTitle: 'Request received',
       successText: 'Thank you. Your request has been received — I’ll get back to you very soon.',
-      errorText: 'Sending failed. You can reach me directly by phone or email.',
+      errorText: 'Sending failed. You can reach me directly by email.',
       successEyebrow: 'Talk soon',
       successLead: 'Your project is in good hands.',
       successDetail:
