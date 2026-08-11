@@ -15,6 +15,9 @@ export default defineConfig({
   },
   integrations: [
     sitemap({
+      // L'espace d'administration n'a rien à faire dans le sitemap : il est en
+      // noindex, et l'y laisser reviendrait à le signaler aux moteurs.
+      filter: (page) => !page.includes('/admin'),
       i18n: {
         defaultLocale: 'fr',
         locales: { fr: 'fr-FR', en: 'en-US' },

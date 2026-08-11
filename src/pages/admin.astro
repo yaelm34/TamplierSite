@@ -1,0 +1,661 @@
+---
+// Espace analytics — accès réservé.
+//
+// Page volontairement AUTONOME : ni Header, ni Footer, ni préchargement de
+// polices. Ce n'est pas une page du site vitrine, elle n'a ni à lui ressembler
+// dans sa structure, ni à peser sur son budget de chargement.
+//
+// Écrit en JavaScript natif plutôt qu'avec un framework : le site n'embarque
+// aucune bibliothèque d'interface, et en ajouter une pour un seul écran
+// d'administration serait payé par toutes les pages au moment de l'installation.
+const noIndex = true;
+---
+
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Analytics — Tamplier Auto Sourcing</title>
+    {noIndex && <meta name="robots" content="noindex, nofollow" />}
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <div id="root" class="ad-center"><div class="ad-spin"></div></div>
+
+    <style is:global>
+      /* Palette reprise de la charte du site (vert racing + or), mais en fond
+         sombre : un tableau de bord se consulte longtemps, et les grands aplats
+         clairs du site vitrine fatiguent à cet usage. */
+      :root {
+        --racing: #00352f;
+        --racing-deep: #00211d;
+        --racing-line: #0e4a40;
+        --gold: #c9a227;
+        --gold-light: #e8d9a0;
+        --ivory: #f7f5f0;
+        --muted: #8fa8a2;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: var(--racing-deep);
+        color: var(--ivory);
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        font-size: 15px;
+        line-height: 1.5;
+      }
+      h1, h2 { font-family: 'Fraunces', Georgia, serif; font-weight: 400; }
+
+      .ad-center { min-height: 100vh; display: grid; place-items: center; padding: 24px; }
+      .ad-spin {
+        width: 34px; height: 34px; border-radius: 50%;
+        border: 2px solid var(--racing-line); border-top-color: var(--gold);
+        animation: adspin 0.8s linear infinite;
+      }
+      @keyframes adspin { to { transform: rotate(360deg); } }
+
+      .ad-wrap { max-width: 1180px; margin: 0 auto; padding: 22px 20px 60px; }
+
+      .ad-head {
+        display: flex; flex-wrap: wrap; gap: 14px;
+        align-items: center; justify-content: space-between;
+        padding-bottom: 16px; margin-bottom: 22px;
+        border-bottom: 1px solid var(--racing-line);
+      }
+      .ad-logo { font-family: 'Fraunces', Georgia, serif; font-size: 20px; letter-spacing: 0.01em; }
+      .ad-logo span { color: var(--gold); }
+      .ad-head-right { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+
+      .ad-range { display: flex; flex-wrap: wrap; gap: 6px; }
+      .ad-chip {
+        background: transparent; color: var(--muted);
+        border: 1px solid var(--racing-line); border-radius: 999px;
+        padding: 7px 14px; font-size: 13px; font-weight: 600; cursor: pointer;
+        font-family: inherit; transition: all 0.15s;
+      }
+      .ad-chip:hover { color: var(--ivory); border-color: var(--gold-dark, #8a6a11); }
+      .ad-chip.on { background: var(--gold); border-color: var(--gold); color: var(--racing-deep); }
+
+      /* Champ du filtre personnalisé : masqué tant que « Personnalisé » n'est pas
+         choisi, pour ne pas encombrer la barre dans le cas courant. */
+      .ad-custom { display: none; align-items: center; gap: 6px; }
+      .ad-custom.on { display: flex; }
+      .ad-date {
+        background: var(--racing); color: var(--ivory);
+        border: 1px solid var(--racing-line); border-radius: 10px;
+        padding: 6px 10px; font-size: 13px; font-family: inherit;
+        color-scheme: dark; /* sinon l'icône native du sélecteur reste noire sur fond sombre */
+      }
+      .ad-custom-lbl { font-size: 13px; color: var(--muted); }
+
+      .ad-ghost {
+        background: transparent; color: var(--muted); font-family: inherit;
+        border: 1px solid var(--racing-line); border-radius: 10px;
+        padding: 7px 12px; font-size: 13px; font-weight: 600; cursor: pointer;
+      }
+      .ad-ghost:hover { color: var(--ivory); }
+      .ad-danger { color: #e08a84; border-color: #6b322e; }
+
+      .ad-kpis {
+        display: grid; gap: 12px; margin-bottom: 16px;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      }
+      .ad-kpi {
+        background: var(--racing); border: 1px solid var(--racing-line);
+        border-radius: 14px; padding: 16px 18px;
+      }
+      .ad-kpi-val { font-family: 'Fraunces', Georgia, serif; font-size: 27px; line-height: 1.1; }
+      .ad-kpi-lbl { color: var(--muted); font-size: 12px; margin-top: 4px; }
+
+      .ad-exclude {
+        display: flex; flex-wrap: wrap; gap: 10px;
+        align-items: center; justify-content: space-between;
+        color: var(--muted); font-size: 13px; margin-bottom: 18px;
+      }
+
+      .ad-card {
+        background: var(--racing); border: 1px solid var(--racing-line);
+        border-radius: 16px; padding: 18px; margin-bottom: 16px;
+      }
+      .ad-card h2 { font-size: 15px; margin: 0 0 14px; letter-spacing: 0.02em; }
+
+      .ad-bars { display: flex; align-items: flex-end; gap: 3px; height: 190px; }
+      .ad-bar-col { flex: 1; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 5px; min-width: 0; }
+      .ad-bar { width: 100%; background: linear-gradient(180deg, var(--gold), var(--gold-dark, #8a6a11)); border-radius: 3px 3px 0 0; min-height: 2px; }
+      .ad-bar-x { font-size: 9.5px; color: var(--muted); white-space: nowrap; }
+
+      .ad-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+
+      .ad-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 7px; }
+      .ad-list li { position: relative; display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-radius: 8px; overflow: hidden; }
+      .ad-list-bar { position: absolute; inset: 0 auto 0 0; background: rgba(201, 162, 39, 0.16); border-radius: 8px; }
+      .ad-list-name { position: relative; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13.5px; }
+      .ad-list-count { position: relative; font-weight: 700; font-size: 13.5px; color: var(--gold-light); }
+      .ad-empty, .ad-note { color: var(--muted); font-size: 13px; }
+
+      .ad-login { width: min(380px, 100%); display: flex; flex-direction: column; gap: 12px; }
+      .ad-login-sub { color: var(--muted); font-size: 13.5px; margin: -4px 0 6px; }
+      .ad-input {
+        background: var(--racing-deep); color: var(--ivory); font-family: inherit;
+        border: 1px solid var(--racing-line); border-radius: 10px;
+        padding: 12px 14px; font-size: 15px; width: 100%;
+      }
+      .ad-btn {
+        background: var(--gold); color: var(--racing-deep); font-family: inherit;
+        border: 0; border-radius: 10px; padding: 12px 16px;
+        font-size: 15px; font-weight: 700; cursor: pointer;
+      }
+      .ad-btn[disabled] { opacity: 0.6; cursor: default; }
+      .ad-btn-danger { background: #c4514a; color: #fff; }
+      .ad-error { color: #f0a19b; font-size: 13.5px; }
+      .ad-msg { max-width: 520px; }
+      .ad-msg code { background: var(--racing-deep); padding: 2px 6px; border-radius: 5px; font-size: 13px; }
+
+      .ad-modal-bg { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); display: grid; place-items: center; padding: 20px; z-index: 10; }
+      .ad-modal { background: var(--racing); border: 1px solid var(--racing-line); border-radius: 18px; padding: 24px; max-width: 440px; text-align: center; }
+      .ad-modal-ic { font-size: 30px; }
+      .ad-modal h2 { margin: 8px 0; }
+      .ad-modal-btns { display: flex; gap: 10px; justify-content: center; margin-top: 18px; }
+    </style>
+
+    <script>
+      import { createClient } from '@supabase/supabase-js';
+
+      const URL_ = import.meta.env.PUBLIC_SUPABASE_URL;
+      const KEY_ = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+      const configured = Boolean(URL_ && KEY_);
+      const supabase = configured ? createClient(URL_, KEY_) : null;
+
+      const EXCL_NOTE = 'appareil admin';
+      const root = document.getElementById('root');
+
+      // Plages proposées. `1` et `custom` sont les deux ajouts par rapport à la
+      // version CarnaFish.
+      const RANGES = [
+        { key: 1, label: "Aujourd'hui" },
+        { key: 7, label: '7 jours' },
+        { key: 30, label: '30 jours' },
+        { key: 90, label: '90 jours' },
+        { key: 'custom', label: 'Personnalisé' },
+      ];
+
+      // Bornes par défaut du mode personnalisé : les 14 derniers jours. Deux
+      // dates plutôt qu'un nombre de jours — c'est ce qui permet de regarder un
+      // mois écoulé, ou la semaine d'une campagne, sans calcul mental.
+      const pad = (n) => String(n).padStart(2, '0');
+      const localKey = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+
+      const state = {
+        phase: 'loading', // loading | noconfig | login | denied | ready
+        mode: 30, // 1 | 7 | 30 | 90 | 'custom'
+        from: localKey(new Date(Date.now() - 13 * 86400000)),
+        to: localKey(new Date()),
+        rows: [],
+        excludedCount: 0,
+        truncated: false,
+        loadingData: false,
+        authError: '',
+        resetOpen: false,
+        resetBusy: false,
+        resetError: '',
+      };
+
+      /**
+       * Fenêtre d'analyse, seule source de vérité pour la requête ET le
+       * graphique. Les deux doivent parler des mêmes bornes : les calculer
+       * séparément est le meilleur moyen d'afficher un histogramme qui ne
+       * correspond pas au total annoncé au-dessus.
+       *
+       * En mode personnalisé, les bornes sont des dates LOCALES : le client
+       * choisit « du 1er au 15 » dans son calendrier, pas en temps universel.
+       * La journée de fin est incluse jusqu'à 23:59:59.
+       */
+      function windowRange() {
+        if (state.mode === 'custom') {
+          // Dates saisies à l'envers : on les remet dans l'ordre plutôt que de
+          // renvoyer un résultat vide sans explication.
+          let from = state.from;
+          let to = state.to;
+          if (from > to) [from, to] = [to, from];
+          const dayCount =
+            Math.round(
+              (new Date(`${to}T00:00:00`).getTime() - new Date(`${from}T00:00:00`).getTime()) /
+                86400000
+            ) + 1;
+          return {
+            custom: true,
+            from,
+            to,
+            since: new Date(`${from}T00:00:00`),
+            until: new Date(`${to}T23:59:59.999`),
+            dayCount,
+          };
+        }
+        return {
+          custom: false,
+          since: new Date(Date.now() - state.mode * 86400000),
+          until: null, // jusqu'à maintenant
+          dayCount: state.mode,
+        };
+      }
+
+      // Même clé que src/lib/track.js : même origine, donc même localStorage que
+      // le site — c'est ce qui permet d'exclure l'appareil de l'administrateur.
+      function getOrMakeVid() {
+        try {
+          let id = localStorage.getItem('tas_vid');
+          if (!id) {
+            id =
+              (crypto.randomUUID && crypto.randomUUID()) ||
+              String(Date.now()) + Math.random().toString(36).slice(2);
+            localStorage.setItem('tas_vid', id);
+          }
+          return id;
+        } catch {
+          return null;
+        }
+      }
+
+      const esc = (s) =>
+        String(s).replace(/[&<>"']/g, (c) =>
+          ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]
+        );
+      const nf = (n) => Number(n).toLocaleString('fr-FR');
+      // Jour LOCAL et non UTC : en France (UTC+1/+2), découper la chaîne ISO
+      // ferait basculer une visite de 00 h 30 sur la veille — décalage invisible
+      // sur 90 jours, mais flagrant dès qu'on regarde une journée précise.
+      const dayKey = (iso) => localKey(new Date(iso));
+      const fmtDay = (k) => { const [, m, d] = k.split('-'); return `${d}/${m}`; };
+
+      // ---------- données ----------
+      async function loadData() {
+        if (state.phase !== 'ready') return;
+        state.loadingData = true;
+        render();
+        const w = windowRange();
+        let q = supabase
+          .from('site_visits')
+          .select('visitor_id, path, referrer_host, utm_source, utm_medium, utm_campaign, device, browser_lang, created_at')
+          .gte('created_at', w.since.toISOString());
+        // Borne haute uniquement en mode personnalisé : sur les plages
+        // glissantes, la fenêtre court jusqu'à maintenant.
+        if (w.until) q = q.lte('created_at', w.until.toISOString());
+
+        const [visitsRes, exRes] = await Promise.all([
+          q.order('created_at', { ascending: false }).limit(10000),
+          supabase.from('analytics_excluded').select('visitor_id'),
+        ]);
+        const excl = new Set((exRes.data || []).map((e) => e.visitor_id));
+        const all = visitsRes.data || [];
+        state.rows = all.filter((r) => !excl.has(r.visitor_id)); // appareils exclus retirés
+        state.truncated = all.length >= 10000;
+        state.excludedCount = excl.size;
+        state.loadingData = false;
+        render();
+      }
+
+      function computeStats() {
+        const rows = state.rows;
+        const w = windowRange();
+        const uniques = new Set();
+        const byDay = {}, byRef = {}, byPage = {}, byDevice = {}, byLang = {}, bySource = {}, byHour = {};
+        const visitorDays = {};
+        const todayKey = dayKey(new Date().toISOString());
+        const d7 = new Date(Date.now() - 7 * 86400000).toISOString();
+        let today = 0, last7 = 0;
+
+        for (const r of rows) {
+          if (r.visitor_id) uniques.add(r.visitor_id);
+          const k = dayKey(r.created_at);
+          byDay[k] = (byDay[k] || 0) + 1;
+          if (r.visitor_id) (visitorDays[r.visitor_id] || (visitorDays[r.visitor_id] = new Set())).add(k);
+          const hr = new Date(r.created_at).getHours();
+          byHour[hr] = (byHour[hr] || 0) + 1;
+          if (k === todayKey) today++;
+          if (r.created_at >= d7) last7++;
+          const ref = r.referrer_host || 'Accès direct';
+          byRef[ref] = (byRef[ref] || 0) + 1;
+          byPage[r.path || '/'] = (byPage[r.path || '/'] || 0) + 1;
+          const dev = r.device || 'inconnu';
+          byDevice[dev] = (byDevice[dev] || 0) + 1;
+          if (r.browser_lang) { const l = r.browser_lang.slice(0, 2); byLang[l] = (byLang[l] || 0) + 1; }
+          if (r.utm_source) bySource[r.utm_source] = (bySource[r.utm_source] || 0) + 1;
+        }
+
+        // Série du graphique. Sur UNE journée, un histogramme à une seule barre
+        // ne dit rien : on bascule sur les heures, qui sont l'information utile
+        // à cette échelle.
+        const series = [];
+        if (w.dayCount === 1) {
+          const hourCount = {};
+          for (const r of rows) {
+            const h = new Date(r.created_at).getHours();
+            hourCount[h] = (hourCount[h] || 0) + 1;
+          }
+          if (w.custom) {
+            // Journée précise : de 00 h à 23 h, l'ordre du calendrier.
+            for (let h = 0; h < 24; h++) {
+              series.push({ k: `${pad(h)} h`, count: hourCount[h] || 0 });
+            }
+          } else {
+            // Plage glissante : les 24 dernières heures, la plus récente à droite.
+            const nowH = new Date().getHours();
+            for (let i = 23; i >= 0; i--) {
+              const h = (nowH - i + 24) % 24;
+              series.push({ k: `${pad(h)} h`, count: hourCount[h] || 0 });
+            }
+          }
+        } else if (w.custom) {
+          // On parcourt le calendrier jour après jour depuis la borne basse :
+          // soustraire des millisecondes à « maintenant » décalerait tout d'un
+          // jour au passage à l'heure d'été.
+          const d = new Date(`${w.from}T12:00:00`); // midi : à l'abri des sauts d'heure
+          for (let i = 0; i < w.dayCount; i++) {
+            const k = localKey(d);
+            series.push({ k: fmtDay(k), count: byDay[k] || 0 });
+            d.setDate(d.getDate() + 1);
+          }
+        } else {
+          for (let i = w.dayCount - 1; i >= 0; i--) {
+            const k = dayKey(new Date(Date.now() - i * 86400000).toISOString());
+            series.push({ k: fmtDay(k), count: byDay[k] || 0 });
+          }
+        }
+
+        const sortTop = (obj, m = 8) => Object.entries(obj).sort((a, b) => b[1] - a[1]).slice(0, m);
+        return {
+          total: rows.length,
+          uniques: uniques.size,
+          today,
+          last7,
+          pagesPerVisitor: uniques.size ? rows.length / uniques.size : 0,
+          returning: Object.values(visitorDays).filter((s) => s.size >= 2).length,
+          series,
+          showLabels: series.length <= 31,
+          topRef: sortTop(byRef),
+          topPage: sortTop(byPage),
+          devices: sortTop(byDevice, 5),
+          langs: sortTop(byLang, 6),
+          sources: sortTop(bySource),
+          hours: sortTop(byHour).map(([h, c]) => [`${String(h).padStart(2, '0')} h`, c]),
+        };
+      }
+
+      // ---------- rendu ----------
+      const kpi = (label, value, raw) =>
+        `<div class="ad-kpi"><div class="ad-kpi-val">${raw ? esc(value) : nf(value)}</div><div class="ad-kpi-lbl">${esc(label)}</div></div>`;
+
+      function listCard(title, rows, empty) {
+        const max = Math.max(1, ...rows.map((r) => r[1]));
+        const body = rows.length
+          ? `<ul class="ad-list">${rows
+              .map(
+                ([name, count]) =>
+                  `<li><div class="ad-list-bar" style="width:${(count / max) * 100}%"></div><span class="ad-list-name" title="${esc(name)}">${esc(name)}</span><span class="ad-list-count">${nf(count)}</span></li>`
+              )
+              .join('')}</ul>`
+          : `<p class="ad-empty">${esc(empty)}</p>`;
+        return `<section class="ad-card"><h2>${esc(title)}</h2>${body}</section>`;
+      }
+
+      function render() {
+        if (state.phase === 'loading') {
+          root.className = 'ad-center';
+          root.innerHTML = '<div class="ad-spin"></div>';
+          return;
+        }
+
+        if (state.phase === 'noconfig') {
+          root.className = 'ad-center';
+          root.innerHTML = `<div class="ad-card ad-msg">
+            <h1>Configuration manquante</h1>
+            <p>Les variables <code>PUBLIC_SUPABASE_URL</code> et <code>PUBLIC_SUPABASE_ANON_KEY</code> ne sont pas définies.</p>
+            <p class="ad-note">Renseigne-les dans <code>.env</code> puis rebuild — et aussi chez l'hébergeur.</p>
+          </div>`;
+          return;
+        }
+
+        if (state.phase === 'login' || state.phase === 'denied') {
+          root.className = 'ad-center';
+          root.innerHTML = `<form class="ad-card ad-login" id="loginForm">
+            <div class="ad-logo">TAMPLIER<span> · Analytics</span></div>
+            <p class="ad-login-sub">Statistiques du site — accès réservé.</p>
+            <input class="ad-input" type="email" id="email" placeholder="Adresse e-mail" autocomplete="username" required />
+            <input class="ad-input" type="password" id="password" placeholder="Mot de passe" autocomplete="current-password" required />
+            ${state.phase === 'denied' ? '<div class="ad-error">Ce compte n’est pas administrateur.</div>' : ''}
+            ${state.authError ? `<div class="ad-error">${esc(state.authError)}</div>` : ''}
+            <button class="ad-btn" type="submit" id="loginBtn">Se connecter</button>
+          </form>`;
+          document.getElementById('loginForm').addEventListener('submit', signIn);
+          return;
+        }
+
+        // ----- tableau de bord -----
+        const s = computeStats();
+        const w = windowRange();
+        const rangeLabel = w.custom
+          ? w.dayCount === 1
+            ? fmtDay(w.from)
+            : `${fmtDay(w.from)} → ${fmtDay(w.to)}`
+          : w.dayCount === 1
+            ? '24 h'
+            : `${w.dayCount} j`;
+        const chartTitle =
+          s.series.length === 24
+            ? w.custom
+              ? `Visites par heure — ${fmtDay(w.from)}`
+              : 'Visites par heure (24 h)'
+            : 'Visites par jour';
+        const maxBar = Math.max(1, ...s.series.map((x) => x.count));
+
+        root.className = 'ad-wrap';
+        root.innerHTML = `
+          <header class="ad-head">
+            <div class="ad-logo">TAMPLIER<span> · Analytics</span></div>
+            <div class="ad-head-right">
+              <div class="ad-range">
+                ${RANGES.map(
+                  (r) =>
+                    `<button class="ad-chip${state.mode === r.key ? ' on' : ''}" data-range="${r.key}">${esc(r.label)}</button>`
+                ).join('')}
+              </div>
+              <div class="ad-custom${state.mode === 'custom' ? ' on' : ''}">
+                <span class="ad-custom-lbl">du</span>
+                <input class="ad-date" type="date" id="fromDate" value="${esc(state.from)}" max="${esc(localKey(new Date()))}" />
+                <span class="ad-custom-lbl">au</span>
+                <input class="ad-date" type="date" id="toDate" value="${esc(state.to)}" max="${esc(localKey(new Date()))}" />
+              </div>
+              <button class="ad-ghost" id="refresh" title="Rafraîchir">↻</button>
+              <button class="ad-ghost ad-danger" id="askReset">Réinitialiser à 0</button>
+              <button class="ad-ghost" id="signout">Déconnexion</button>
+            </div>
+          </header>
+          ${
+            state.loadingData
+              ? '<div class="ad-center" style="min-height:40vh"><div class="ad-spin"></div></div>'
+              : `
+          <div class="ad-kpis">
+            ${kpi(`Visites (${rangeLabel})`, s.total)}
+            ${kpi('Visiteurs uniques', s.uniques)}
+            ${kpi("Aujourd'hui", s.today)}
+            ${kpi('7 derniers jours', s.last7)}
+            ${kpi('Pages / visiteur', s.pagesPerVisitor.toFixed(1), true)}
+            ${kpi('Visiteurs récurrents', s.returning)}
+          </div>
+
+          <div class="ad-exclude">
+            <span>${nf(state.excludedCount)} appareil(s) exclu(s) des stats (dont le tien, ajouté automatiquement à la connexion).</span>
+            <button class="ad-ghost" id="exclude">Exclure cet appareil</button>
+          </div>
+
+          <section class="ad-card">
+            <h2>${esc(chartTitle)}</h2>
+            <div class="ad-bars">
+              ${s.series
+                .map(
+                  (x) =>
+                    `<div class="ad-bar-col" title="${esc(x.k)} · ${x.count}"><div class="ad-bar" style="height:${(x.count / maxBar) * 100}%"></div>${s.showLabels ? `<span class="ad-bar-x">${esc(x.k)}</span>` : ''}</div>`
+                )
+                .join('')}
+            </div>
+          </section>
+
+          <div class="ad-grid">
+            ${listCard('Provenance (référents)', s.topRef, 'Aucun référent')}
+            ${listCard('Pages', s.topPage, '—')}
+            ${listCard('Appareils', s.devices, '—')}
+            ${listCard('Langues', s.langs, '—')}
+            ${listCard("Heures d'affluence", s.hours, '—')}
+            ${listCard('Campagnes (UTM source)', s.sources, 'Aucune campagne UTM')}
+          </div>
+
+          ${state.truncated ? '<p class="ad-note">Affichage limité aux 10 000 visites les plus récentes de la fenêtre — les totaux ci-dessus restent exacts.</p>' : ''}
+          `
+          }
+          ${
+            state.resetOpen
+              ? `<div class="ad-modal-bg" id="modalBg"><div class="ad-modal" id="modal">
+                  <div class="ad-modal-ic">⚠️</div>
+                  <h2>Remettre le compteur à zéro ?</h2>
+                  <p>Toutes les visites enregistrées seront <strong>définitivement supprimées</strong>. Cette action est irréversible.</p>
+                  ${state.resetError ? `<div class="ad-error">${esc(state.resetError)}</div>` : ''}
+                  <div class="ad-modal-btns">
+                    <button class="ad-ghost" id="cancelReset"${state.resetBusy ? ' disabled' : ''}>Annuler</button>
+                    <button class="ad-btn ad-btn-danger" id="doReset"${state.resetBusy ? ' disabled' : ''}>${state.resetBusy ? 'Suppression…' : 'Oui, tout supprimer'}</button>
+                  </div>
+                </div></div>`
+              : ''
+          }
+        `;
+        wire();
+      }
+
+      function wire() {
+        root.querySelectorAll('[data-range]').forEach((b) =>
+          b.addEventListener('click', () => {
+            const v = b.dataset.range;
+            state.mode = v === 'custom' ? 'custom' : Number(v);
+            render();
+            loadData();
+          })
+        );
+
+        // Sur `change` et non `input` : le sélecteur de date émet des valeurs
+        // intermédiaires pendant la saisie au clavier (« 0002-01-01 » en tapant
+        // l'année), chacune déclencherait une requête inutile.
+        const bindDate = (id, key) => {
+          const el = root.querySelector(id);
+          if (!el) return;
+          el.addEventListener('change', () => {
+            if (!el.value) return; // champ vidé : on garde la borne précédente
+            state[key] = el.value;
+            if (state.mode === 'custom') { render(); loadData(); }
+          });
+        };
+        bindDate('#fromDate', 'from');
+        bindDate('#toDate', 'to');
+
+        root.querySelector('#refresh')?.addEventListener('click', loadData);
+        root.querySelector('#signout')?.addEventListener('click', signOut);
+        root.querySelector('#exclude')?.addEventListener('click', excludeDevice);
+        root.querySelector('#askReset')?.addEventListener('click', () => {
+          state.resetError = '';
+          state.resetOpen = true;
+          render();
+        });
+        root.querySelector('#cancelReset')?.addEventListener('click', () => {
+          if (state.resetBusy) return;
+          state.resetOpen = false;
+          render();
+        });
+        root.querySelector('#doReset')?.addEventListener('click', doReset);
+        root.querySelector('#modalBg')?.addEventListener('click', (e) => {
+          if (e.target.id === 'modalBg' && !state.resetBusy) { state.resetOpen = false; render(); }
+        });
+      }
+
+      // ---------- authentification ----------
+      async function checkAdmin(user) {
+        if (!user) { state.phase = 'login'; render(); return; }
+        const { data, error } = await supabase.rpc('is_admin', { uid: user.id });
+        state.phase = error || !data ? 'denied' : 'ready';
+        render();
+        if (state.phase === 'ready') { autoExclude(); loadData(); }
+      }
+
+      async function signIn(e) {
+        e.preventDefault();
+        const btn = document.getElementById('loginBtn');
+        btn.disabled = true;
+        btn.textContent = 'Connexion…';
+        state.authError = '';
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: document.getElementById('email').value.trim(),
+          password: document.getElementById('password').value,
+        });
+        if (error) {
+          state.authError = 'Identifiants invalides.';
+          render();
+          return;
+        }
+        checkAdmin(data.user);
+      }
+
+      async function signOut() {
+        await supabase.auth.signOut();
+        state.rows = [];
+        state.phase = 'login';
+        render();
+      }
+
+      // Dès qu'un administrateur se connecte, SON appareil rejoint la liste des
+      // exclus : sans ça, ses propres passages sur le site gonfleraient les
+      // chiffres qu'il consulte.
+      let didAutoExclude = false;
+      async function autoExclude() {
+        if (didAutoExclude) return;
+        didAutoExclude = true;
+        const vid = getOrMakeVid();
+        if (!vid) return;
+        await supabase
+          .from('analytics_excluded')
+          .upsert({ visitor_id: vid, note: EXCL_NOTE }, { onConflict: 'visitor_id' });
+        loadData();
+      }
+
+      async function excludeDevice() {
+        const vid = getOrMakeVid();
+        if (!vid) return;
+        await supabase
+          .from('analytics_excluded')
+          .upsert({ visitor_id: vid, note: EXCL_NOTE }, { onConflict: 'visitor_id' });
+        loadData();
+      }
+
+      async function doReset() {
+        state.resetBusy = true;
+        state.resetError = '';
+        render();
+        const { error } = await supabase.rpc('reset_site_visits');
+        state.resetBusy = false;
+        if (error) {
+          state.resetError = error.message || 'Échec de la réinitialisation.';
+          render();
+          return;
+        }
+        state.resetOpen = false;
+        render();
+        loadData();
+      }
+
+      // ---------- démarrage ----------
+      if (!configured) {
+        state.phase = 'noconfig';
+        render();
+      } else {
+        supabase.auth.getSession().then(({ data }) => checkAdmin(data.session?.user));
+      }
+    </script>
+  </body>
+</html>

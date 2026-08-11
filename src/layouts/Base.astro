@@ -264,6 +264,15 @@ const jsonLd = {
       import '../lib/motion.ts';
     </script>
 
+    <!-- Mesure d'audience maison (voir src/lib/track.js et supabase/site-analytics.sql).
+         Aucun cookie, aucune donnée personnelle, aucun service tiers : un simple
+         identifiant anonyme de navigateur. Sans les variables d'environnement
+         Supabase, le module ne fait rien — le site fonctionne à l'identique. -->
+    <script>
+      import { trackVisit } from '../lib/track.js';
+      trackVisit();
+    </script>
+
     <!-- Mémorise la langue choisie via le sélecteur (respecte le choix ensuite). -->
     <script is:inline>
       document.addEventListener('click', function (e) {
