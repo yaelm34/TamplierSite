@@ -20,13 +20,15 @@ export const site = {
   city: 'Montpellier',
   url: 'https://www.tamplierautosourcing.fr',
   email: 'contact@tamplierautosourcing.com',
-  phone: '06 40 30 78 77',
-  phoneIntl: '+33640307877',
+  phone: '06 32 83 15 53',
+  phoneIntl: '+33632831553',
+  // Volontairement réduite à la VILLE. L'adresse postale complète a été retirée
+  // du site à la demande du client ; `locality` et `country` suffisent à rester
+  // un `PostalAddress` valide pour le JSON-LD, et à ancrer le référencement
+  // local sur Montpellier. Ne pas y remettre rue ni code postal sans le lui
+  // redemander.
   address: {
-    street: '278 Rue Alexandra David Neel',
-    postalCode: '34730',
-    locality: 'Prades-le-Lez',
-    region: 'Montpellier',
+    locality: 'Montpellier',
     country: 'FR',
   },
   founder: 'TAMPLIER Anthony',
@@ -55,7 +57,7 @@ export const brands = [
 // --- Identifiants légaux FR (partagés) ---------------------------------------
 export const legal = {
   companyLine:
-    'TAMPLIER AUTO SOURCING – SASU au capital de 1 000 € – Siège social : 278 Rue Alexandra David Neel, 34730 Prades-le-Lez – 106 997 695 RCS de Montpellier – SIRET 106 997 695 00015 – TVA FR181069976965 – Code APE : 4511Z (Commerce de voitures automobiles)',
+    'TAMPLIER AUTO SOURCING – SASU au capital de 1 000 € – Siège social : Montpellier – 106 997 695 RCS de Montpellier – SIRET 106 997 695 00015 – TVA FR181069976965 – Code APE : 4511Z (Commerce de voitures automobiles)',
   capital: '1 000 €',
   rcs: '106 997 695 RCS de Montpellier',
   siret: '106 997 695 00015',
@@ -122,7 +124,7 @@ const fr = {
     title: 'Le Concept',
     lead: "Une voiture d'exception ne se cherche pas seul.",
     paragraphs: [
-      "Vous avez le projet d'acquérir une sportive ou une premium ? J'active mon réseau en France et en Europe pour dénicher, auditer, négocier et sécuriser votre futur véhicule.",
+      "Vous avez le projet d'acquérir un véhicule d'exception ? Nous activons notre réseau en France et en Europe pour dénicher, auditer, négocier et sécuriser votre futur véhicule.",
       "Un accompagnement 100 % sur mesure — de l'expression de votre besoin jusqu'à la remise des clés.",
     ],
     stats: [

@@ -14,7 +14,7 @@ import { site, legal } from '../../data/content';
     joint-stock company) with a share capital of {legal.capital}.
   </p>
   <ul>
-    <li>Registered office: {site.address.street}, {site.address.postalCode} {site.address.locality}</li>
+    <li>Registered office: {site.address.locality}</li>
     <li>{legal.rcs}</li>
     <li>SIRET: {legal.siret}</li>
     <li>Intra-community VAT no.: {legal.tva}</li>
@@ -25,9 +25,8 @@ import { site, legal } from '../../data/content';
 
   <h2>Hosting</h2>
   <p>
-    This site is hosted on a high-availability static infrastructure (e.g. Vercel Inc. or
-    Netlify, Inc.). The host's full contact details are available on request at
-    <a href={`mailto:${site.email}`}>{site.email}</a>.
+    This site is hosted by <strong>Vercel Inc.</strong>, 440 N Barranca Ave #4133, Covina,
+    CA 91723, United States — <a href="https://vercel.com" rel="noopener noreferrer" target="_blank">vercel.com</a>.
   </p>
 
   <h2>Intellectual property</h2>

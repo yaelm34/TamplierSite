@@ -14,7 +14,7 @@ const { ui } = getContent(Astro.currentLocale);
     Le présent site est édité par <strong>{site.name}</strong>, SASU au capital de {legal.capital}.
   </p>
   <ul>
-    <li>Siège social : {site.address.street}, {site.address.postalCode} {site.address.locality}</li>
+    <li>Siège social : {site.address.locality}</li>
     <li>{legal.rcs}</li>
     <li>SIRET : {legal.siret}</li>
     <li>N° de TVA intracommunautaire : {legal.tva}</li>
@@ -25,9 +25,8 @@ const { ui } = getContent(Astro.currentLocale);
 
   <h2>Hébergement</h2>
   <p>
-    Ce site est hébergé sur une infrastructure statique haute disponibilité (par ex. Vercel Inc.
-    ou Netlify, Inc.). Les coordonnées complètes de l'hébergeur sont communiquées sur simple
-    demande à l'adresse <a href={`mailto:${site.email}`}>{site.email}</a>.
+    Ce site est hébergé par <strong>Vercel Inc.</strong>, 440 N Barranca Ave #4133, Covina,
+    CA 91723, États-Unis — <a href="https://vercel.com" rel="noopener noreferrer" target="_blank">vercel.com</a>.
   </p>
 
   <h2>Propriété intellectuelle</h2>

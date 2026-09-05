@@ -49,6 +49,10 @@ const altLang = cur === 'en' ? 'fr' : 'en';
     </nav>
 
     <div class="hidden items-center gap-5 lg:flex">
+      {/* Pas d'icône d'appel ici : sur ordinateur, un lien `tel:` n'appelle pas
+          — il tente d'ouvrir Skype ou Teams, ou ne fait rien du tout. Le
+          raccourci n'existe donc que dans la barre mobile ci-dessous. Le numéro
+          reste évidemment lisible dans le bloc Contact et le pied de page. */}
       <a
         href={altHref}
         hreflang={altLang}
@@ -65,8 +69,20 @@ const altLang = cur === 'en' ? 'fr' : 'en';
       <Button href={cta.primary.href} variant="solid" class="!px-6 !py-3">{cta.primary.label}</Button>
     </div>
 
-    <!-- Mobile: language switch + toggle -->
+    <!-- Mobile: phone + language switch + toggle -->
     <div class="flex items-center gap-1 lg:hidden">
+      {/* C'est sur mobile que ce raccourci compte vraiment : le lien `tel:`
+          y ouvre le composeur. Zone de 44 px de haut, comme les voisins,
+          pour rester confortable au pouce. */}
+      <a
+        href={`tel:${site.phoneIntl}`}
+        aria-label={`${ui.contactPhone} ${site.phone}`}
+        class="flex h-11 w-11 items-center justify-center text-racing/70"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" class="h-[1.4rem] w-[1.4rem]" aria-hidden="true">
+          <path d="M7.8 4.2c-.6-.5-1.6-.4-2.1.2L4.3 5.9c-.8.9-.8 2.3-.2 3.3 2.2 3.5 5.2 6.5 8.7 8.7 1 .6 2.4.6 3.3-.2l1.5-1.4c.6-.5.7-1.5.2-2.1l-2-2.4c-.5-.6-1.4-.7-2-.3l-1.4.9c-.4.2-.9.2-1.2-.2l-3.3-3.3c-.3-.3-.4-.8-.2-1.2l.9-1.4c.4-.6.3-1.5-.3-2z" />
+        </svg>
+      </a>
       <a
         href={altHref}
         hreflang={altLang}
@@ -84,6 +100,7 @@ const altLang = cur === 'en' ? 'fr' : 'en';
         type="button"
         class="relative z-50 flex h-11 w-11 items-center justify-center"
         aria-label={ui.menuOpen}
+        aria-expanded="false"
         data-menu-toggle
         data-label-open={ui.menuOpen}
         data-label-close={ui.menuClose}
@@ -100,8 +117,9 @@ const altLang = cur === 'en' ? 'fr' : 'en';
 <!-- Full-screen mobile overlay (dark, dramatic) -->
 <div
   data-menu-panel
-  class="on-dark fixed inset-0 z-40 flex translate-y-[-100%] flex-col justify-center bg-racing-deep px-8 opacity-0 transition-[transform,opacity] duration-700 ease-[var(--ease-lux)] lg:hidden"
+  class="on-dark fixed inset-0 z-40 flex translate-y-[-100%] flex-col justify-center bg-racing-deep px-8 opacity-0 transition-[translate,opacity] duration-700 ease-[var(--ease-lux)] lg:hidden"
   aria-hidden="true"
+  inert
 >
   <span class="glow-follow" aria-hidden="true"></span>
   <nav class="relative flex flex-col gap-2" aria-label={ui.navMobile}>
@@ -135,8 +153,16 @@ const altLang = cur === 'en' ? 'fr' : 'en';
 </div>
 
 <style is:global>
+  /* ⚠️ `translate`, PAS `transform`.
+     Tailwind v4 compile `translate-y-[-100%]` avec la propriété CSS autonome
+     `translate`, là où v3 produisait un `transform: translateY(…)`. La règle
+     d'ouverture forçait `transform: translateY(0) !important` — une AUTRE
+     propriété, qui n'annulait donc rien. Le panneau s'ouvrait bel et bien,
+     mais restait décalé de 100 % vers le haut, hors de l'écran : le menu
+     paraissait vide. Les deux déclarations doivent viser la même propriété
+     que l'utilitaire, et la transition ci-dessus avec elles. */
   [data-menu-open] [data-menu-panel] {
-    transform: translateY(0) !important;
+    translate: 0 0 !important;
     opacity: 1 !important;
   }
   [data-menu-open] .menu-bar {
@@ -159,13 +185,29 @@ const altLang = cur === 'en' ? 'fr' : 'en';
 
 <script>
   const toggle = document.querySelector('[data-menu-toggle]');
+  const panel = document.querySelector('[data-menu-panel]');
   const root = document.documentElement;
   const labelOpen = toggle?.getAttribute('data-label-open') || 'Open menu';
   const labelClose = toggle?.getAttribute('data-label-close') || 'Close menu';
   toggle?.addEventListener('click', () => {
-    const open = root.hasAttribute('data-menu-open');
-    if (open) root.removeAttribute('data-menu-open');
-    else root.setAttribute('data-menu-open', '');
-    toggle.setAttribute('aria-label', open ? labelOpen : labelClose);
+    // On raisonne sur l'état VISÉ, pas sur l'état courant. `hasAttribute` rend
+    // l'état d'AVANT le clic : enchaîner quatre attributs sur cette valeur
+    // inversée est le meilleur moyen d'en inverser un par mégarde.
+    const willOpen = !root.hasAttribute('data-menu-open');
+
+    root.toggleAttribute('data-menu-open', willOpen);
+    toggle.setAttribute('aria-label', willOpen ? labelClose : labelOpen);
+
+    // Annonce « replié / déplié » sur le bouton lui-même.
+    toggle.setAttribute('aria-expanded', String(willOpen));
+
+    // Retire le panneau fermé de l'arbre d'accessibilité…
+    panel?.setAttribute('aria-hidden', String(!willOpen));
+
+    // …et du parcours au clavier. `aria-hidden` seul ne suffisait pas : il
+    // masque aux lecteurs d'écran mais laisse les 7 liens focusables, si bien
+    // qu'en tabulant depuis le header on traversait un menu invisible. `inert`
+    // est ce qui les rend réellement inatteignables.
+    panel?.toggleAttribute('inert', !willOpen);
   });
 </script>
