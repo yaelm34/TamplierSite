@@ -22,6 +22,10 @@ export const site = {
   email: 'contact@tamplierautosourcing.com',
   phone: '06 32 83 15 53',
   phoneIntl: '+33632831553',
+  // Page de liens (réseaux, annonces, contact). Seul lien SORTANT du site :
+  // d'où le `rel="noopener noreferrer"` et l'ouverture dans un nouvel onglet
+  // partout où il est posé.
+  linktree: 'https://linktr.ee/tamplierautosourcing',
   // Volontairement réduite à la VILLE. L'adresse postale complète a été retirée
   // du site à la demande du client ; `locality` et `country` suffisent à rester
   // un `PostalAddress` valide pour le JSON-LD, et à ancrer le référencement
@@ -301,6 +305,7 @@ const fr = {
     menuClose: 'Fermer le menu',
     langLabel: 'English version',
     langCode: 'EN',
+    linksLabel: 'Tous nos liens',
     scroll: 'Défiler',
     heroBannerAlt: "Véhicule d'exception, illustration aquarelle — TAMPLIER Auto Sourcing",
     conceptArtAlt: 'Aston Martin DB de profil, illustration aquarelle premium',
@@ -569,6 +574,7 @@ const en: typeof fr = {
     menuClose: 'Close menu',
     langLabel: 'Version française',
     langCode: 'FR',
+    linksLabel: 'All our links',
     scroll: 'Scroll',
     heroBannerAlt: 'Exceptional vehicle, watercolour illustration — TAMPLIER Auto Sourcing',
     conceptArtAlt: 'Aston Martin DB in profile, premium watercolour illustration',
