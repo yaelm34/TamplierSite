@@ -82,7 +82,7 @@ const fr = {
     // ~155 caractères : au-delà, Google coupe. L'ancienne version en faisait 192,
     // la promesse « 100 % sur mesure » n'était jamais visible dans les résultats.
     description:
-      "Mandataire automobile à Montpellier : je source, audite, négocie et sécurise votre véhicule premium, sportif ou d'exception en France et en Europe.",
+      "Mandataire automobile à Montpellier : nous sourçons, auditons, négocions et sécurisons votre véhicule premium, sportif ou d'exception en France et en Europe.",
     ogAlt: 'TAMPLIER AUTO SOURCING — mandataire automobile premium',
     // Libellé de la prestation pour le JSON-LD (schema.org/Service).
     serviceType: 'Mandataire automobile — sourcing, audit, négociation et import de véhicules premium',
@@ -142,14 +142,14 @@ const fr = {
       {
         n: '01',
         title: 'Le Brief',
-        text: 'Vous me confiez vos critères précis — modèle, motorisation, finitions, options indispensables, budget. Un mandat de recherche exclusif est alors établi.',
+        text: 'Vous nous confiez vos critères précis — modèle, motorisation, finitions, options indispensables, budget. Un mandat de recherche exclusif est alors établi.',
         image: 'lebrief',
         alt: "Deux personnes attablées définissant le cahier des charges d'une Porsche 911 affichée à l'écran, illustration aquarelle",
       },
       {
         n: '02',
         title: 'La Recherche — Le Sourcing',
-        text: "À partir des données inscrites sur le mandat, je source la perle rare parmi les meilleures opportunités du marché : réseaux officiels, concessions, partenaires européens.",
+        text: "À partir des données inscrites sur le mandat, nous sourçons la perle rare parmi les meilleures opportunités du marché : réseaux officiels, concessions, partenaires européens.",
         image: 'recherche',
         alt: "Sourcing d'une Porsche 911 : relevé sur tablette au contact du véhicule, illustration aquarelle",
       },
@@ -275,12 +275,12 @@ const fr = {
     packOptions: ['Executive', 'Premium', 'Prestige', 'Je ne sais pas encore'],
     fields: {
       successTitle: 'Demande transmise',
-      successText: 'Merci. Votre demande a bien été transmise — je reviens vers vous très vite.',
-      errorText: "L'envoi a échoué. Vous pouvez me joindre directement par e-mail.",
+      successText: 'Merci. Votre demande a bien été transmise — nous revenons vers vous très vite.',
+      errorText: "L'envoi a échoué. Vous pouvez nous joindre directement par e-mail.",
       successEyebrow: 'À très vite',
       successLead: 'Votre projet est entre de bonnes mains.',
       successDetail:
-        'Je prends connaissance de votre demande personnellement et vous réponds sous 24 heures pour affiner vos critères et lancer la recherche.',
+        'Nous prenons connaissance de votre demande personnellement et vous répondons sous 24 heures pour affiner vos critères et lancer la recherche.',
       successAgain: 'Envoyer une autre demande',
     },
   },
@@ -325,7 +325,7 @@ const fr = {
     formContactNote: 'E-mail ou téléphone : renseignez au moins l’un des deux.',
     errorRequired: 'Ce champ est obligatoire.',
     errorEmailFormat: 'Merci de saisir une adresse e-mail valide.',
-    errorContactNeeded: 'Indiquez un e-mail ou un téléphone pour que je puisse vous répondre.',
+    errorContactNeeded: 'Indiquez un e-mail ou un téléphone pour que nous puissions vous répondre.',
     formReply: 'Réponse personnelle sous 24 h.',
     formSubmit: 'Envoyer ma demande',
     formSending: 'Envoi en cours…',
@@ -353,7 +353,7 @@ const en: typeof fr = {
     title:
       'Premium car buying agent in Montpellier | TAMPLIER AUTO SOURCING',
     description:
-      'Independent car buying agent in Montpellier, France. I source, inspect, negotiate and secure your premium, sports or exceptional car across Europe.',
+      'Independent car buying agent in Montpellier, France. We source, inspect, negotiate and secure your premium, sports or exceptional car across Europe.',
     ogAlt: 'TAMPLIER AUTO SOURCING — premium car buying agent',
     serviceType: 'Car buying agent — sourcing, audit, negotiation and import of premium vehicles',
     keywords:
@@ -394,7 +394,7 @@ const en: typeof fr = {
     title: 'The Concept',
     lead: 'An exceptional car should never be hunted alone.',
     paragraphs: [
-      'Planning to acquire a sports or premium car? I activate my network across France and Europe to find, inspect, negotiate and secure your future vehicle.',
+      'Planning to acquire an exceptional car? We activate our network across France and Europe to find, inspect, negotiate and secure your future vehicle.',
       'A fully bespoke service — from defining your brief to handing over the keys.',
     ],
     stats: [
@@ -412,14 +412,14 @@ const en: typeof fr = {
       {
         n: '01',
         title: 'The Brief',
-        text: 'You entrust me with your exact criteria — model, engine, trim, must-have options, budget. An exclusive search mandate is then drawn up.',
+        text: 'You entrust us with your exact criteria — model, engine, trim, must-have options, budget. An exclusive search mandate is then drawn up.',
         image: 'lebrief',
         alt: 'Two people at a table setting the brief for a Porsche 911 shown on screen, watercolour illustration',
       },
       {
         n: '02',
         title: 'The Search — Sourcing',
-        text: 'From the criteria set out in the mandate, I source the rare gem among the best opportunities on the market: official networks, dealerships, European partners.',
+        text: 'From the criteria set out in the mandate, We source the rare gem among the best opportunities on the market: official networks, dealerships, European partners.',
         image: 'recherche',
         alt: 'Sourcing a Porsche 911: on-site assessment on a tablet, watercolour illustration',
       },
@@ -545,11 +545,11 @@ const en: typeof fr = {
     fields: {
       successTitle: 'Request received',
       successText: 'Thank you. Your request has been received — I’ll get back to you very soon.',
-      errorText: 'Sending failed. You can reach me directly by email.',
+      errorText: 'Sending failed. You can reach us directly by email.',
       successEyebrow: 'Talk soon',
       successLead: 'Your project is in good hands.',
       successDetail:
-        'I read every request personally and will reply within 24 hours to refine your criteria and start the search.',
+        'We read every request personally and will reply within 24 hours to refine your criteria and start the search.',
       successAgain: 'Send another request',
     },
   },
@@ -593,7 +593,7 @@ const en: typeof fr = {
     formContactNote: 'Email or phone: please provide at least one.',
     errorRequired: 'This field is required.',
     errorEmailFormat: 'Please enter a valid email address.',
-    errorContactNeeded: 'Please provide an email or a phone number so I can reply.',
+    errorContactNeeded: 'Please provide an email or a phone number so we can reply.',
     formReply: 'A personal reply within 24 h.',
     formSubmit: 'Send my request',
     formSending: 'Sending…',
